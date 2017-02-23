@@ -1,0 +1,69 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Chirp:</strong>
+  <%= @observation.chirp_id %>
+</p>
+
+<p>
+  <strong>Provider:</strong>
+  <%= @observation.provider_id %>
+</p>
+
+<p>
+  <strong>Concept:</strong>
+  <%= @observation.concept %>
+</p>
+
+<p>
+  <strong>Started at:</strong>
+  <%= @observation.started_at %>
+</p>
+
+<p>
+  <strong>Ended at:</strong>
+  <%= @observation.ended_at %>
+</p>
+
+<p>
+  <strong>Value:</strong>
+  <%= @observation.value %>
+</p>
+
+<p>
+  <strong>Units:</strong>
+  <%= @observation.units %>
+</p>
+
+<p>
+  <strong>Raw:</strong>
+  <%= @observation.raw %>
+</p>
+
+<p>
+  <strong>Downloaded at:</strong>
+  <%= @observation.downloaded_at %>
+</p>
+
+<p>
+  <strong>Source schema:</strong>
+  <%= @observation.source_schema %>
+</p>
+
+<p>
+  <strong>Source table:</strong>
+  <%= @observation.source_table %>
+</p>
+
+<p>
+  <strong>Source:</strong>
+  <%= @observation.source_id %>
+</p>
+
+<p>
+  <strong>Imported at:</strong>
+  <%= @observation.imported_at %>
+</p>
+
+<%= link_to 'Edit', edit_observation_path(@observation) %> |
+<%= link_to 'Back', observations_path %>

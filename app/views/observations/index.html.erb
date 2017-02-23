@@ -1,0 +1,53 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Observations</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Chirp</th>
+      <th>Provider</th>
+      <th>Concept</th>
+      <th>Started at</th>
+      <th>Ended at</th>
+      <th>Value</th>
+      <th>Units</th>
+      <th>Raw</th>
+      <th>Downloaded at</th>
+      <th>Source schema</th>
+      <th>Source table</th>
+      <th>Source</th>
+      <th>Imported at</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @observations.each do |observation| %>
+      <tr>
+        <td><%= observation.chirp_id %></td>
+        <td><%= observation.provider_id %></td>
+        <td><%= observation.concept %></td>
+        <td><%= observation.started_at %></td>
+        <td><%= observation.ended_at %></td>
+        <td><%= observation.value %></td>
+        <td><%= observation.units %></td>
+        <td><%= observation.raw %></td>
+        <td><%= observation.downloaded_at %></td>
+        <td><%= observation.source_schema %></td>
+        <td><%= observation.source_table %></td>
+        <td><%= observation.source_id %></td>
+        <td><%= observation.imported_at %></td>
+        <td><%#= link_to 'Show', observation %></td>
+        <td><%#= link_to 'Edit', edit_observation_path(observation) %></td>
+        <td><%#= link_to 'Destroy', observation, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<%= will_paginate @observations %>
+
+<br>
+
+<%#= link_to 'New Observation', new_observation_path %>

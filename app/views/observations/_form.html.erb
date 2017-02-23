@@ -1,0 +1,82 @@
+<%= form_for(observation) do |f| %>
+  <% if observation.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(observation.errors.count, "error") %> prohibited this observation from being saved:</h2>
+
+      <ul>
+      <% observation.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :chirp_id %>
+    <%= f.number_field :chirp_id %>
+  </div>
+
+  <div class="field">
+    <%= f.label :provider_id %>
+    <%= f.number_field :provider_id %>
+  </div>
+
+  <div class="field">
+    <%= f.label :concept %>
+    <%= f.text_field :concept %>
+  </div>
+
+  <div class="field">
+    <%= f.label :started_at %>
+    <%= f.datetime_select :started_at %>
+  </div>
+
+  <div class="field">
+    <%= f.label :ended_at %>
+    <%= f.datetime_select :ended_at %>
+  </div>
+
+  <div class="field">
+    <%= f.label :value %>
+    <%= f.text_field :value %>
+  </div>
+
+  <div class="field">
+    <%= f.label :units %>
+    <%= f.text_field :units %>
+  </div>
+
+  <div class="field">
+    <%= f.label :raw %>
+    <%= f.text_field :raw %>
+  </div>
+
+  <div class="field">
+    <%= f.label :downloaded_at %>
+    <%= f.datetime_select :downloaded_at %>
+  </div>
+
+  <div class="field">
+    <%= f.label :source_schema %>
+    <%= f.text_field :source_schema %>
+  </div>
+
+  <div class="field">
+    <%= f.label :source_table %>
+    <%= f.text_field :source_table %>
+  </div>
+
+  <div class="field">
+    <%= f.label :source_id %>
+    <%= f.number_field :source_id %>
+  </div>
+
+  <div class="field">
+    <%= f.label :imported_at %>
+    <%= f.datetime_select :imported_at %>
+  </div>
+
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>
