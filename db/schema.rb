@@ -26,6 +26,11 @@ ActiveRecord::Schema.define(version: 20170223213101) do
     t.string   "source_table",  limit: 50
     t.integer  "source_id"
     t.datetime "imported_at"
+    t.index ["chirp_id", "started_at"], name: "index_observations_on_chirp_id_and_started_at", using: :btree
+    t.index ["chirp_id"], name: "index_observations_on_chirp_id", using: :btree
+    t.index ["concept"], name: "index_observations_on_concept", using: :btree
+    t.index ["started_at"], name: "index_observations_on_started_at", using: :btree
+    t.index ["value"], name: "index_observations_on_value", using: :btree
   end
 
 end
