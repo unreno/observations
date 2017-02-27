@@ -2,41 +2,57 @@
 
 <style>
 
+    body {
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        width: 800px;
+        height: 800px;
+        position: relative;
+    }
+
+    svg {
+        width: 100%;
+        height: 100%;
+        position: center;
+    }
 /*
-.chart rect {
-  fill: steelblue;
-}
+    .toolTip {
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        position: absolute;
+        display: none;
+        width: auto;
+        height: auto;
+        background: none repeat scroll 0 0 white;
+        border: 0 none;
+        border-radius: 8px 8px 8px 8px;
+        box-shadow: -3px 3px 15px #888888;
+        color: black;
+        font: 12px sans-serif;
+        padding: 5px;
+        text-align: center;
+    }
 */
-.chart .legend {
-  fill: black;
-  font: 14px sans-serif;
-  text-anchor: start;
-  font-size: 12px;
-}
+    text {
+        font: 20px sans-serif;
+        color: white;
+    }
+    text.value {
+        font-size: 120%;
+        fill: white;
+    }
 
-.chart text {
-  fill: white;
-  font: 10px sans-serif;
-  text-anchor: end;
-}
+    .axisHorizontal path{
+        fill: none;
+    }
 
-.chart .label {
-  fill: black;
-  font: 14px sans-serif;
-  text-anchor: end;
-}
+    .axisHorizontal .tick line {
+        stroke-width: 1;
+        stroke: rgba(0, 0, 0, 0.2);
+    }
 
-.bar:hover {
-  fill: brown;
-}
-
-.axis path,
-.axis line {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
-}
-
+    .bar {
+        fill: steelblue;
+        fill-opacity: .9;
+    }
 
 </style>
 
@@ -63,138 +79,110 @@
 <!-- must be svg and not div for some? -->
 <!-- must be v3 and not v4 for some -->
 
-<svg class='chart' style='display:inline-block;'>
+<div class='chart' style='display:inline-block;'>
 <!-- /the chart goes here -->
-</svg>
+</div>
 
 <script type="text/javascript">
 //<![CDATA[
 
+// based on http://bl.ocks.org/juan-cb/faf62e91e3c70a99a306
 
-var data = {
-  labels: [
-    'resilience', 'maintainability', 'accessibility',
-    'uptime', 'functionality', 'impact'
-  ],
-  series: [
-    {
-      label: '2012',
-      values: [4, 8, 15, 16, 23, 42]
-    },
-    {
-      label: '2013',
-      values: [12, 43, 22, 11, 73, 25]
-    },
-    {
-      label: '2014',
-      values: [31, 28, 14, 8, 15, 21]
-    },]
-};
 
-var chartWidth       = 300,
-    barHeight        = 20,
-    groupHeight      = barHeight * data.series.length,
-    gapBetweenGroups = 10,
-    spaceForLabels   = 150,
-    spaceForLegend   = 150;
+    data = [
+<% @results.each do |result| %>
+		{label:"<%= "#{result.month}/#{result.year}" %>", value: <%= result.count %>},
+<% end %>
+    ];
 
-// Zip the series data together (first values, second values, etc.)
-var zippedData = [];
-for (var i=0; i<data.labels.length; i++) {
-  for (var j=0; j<data.series.length; j++) {
-    zippedData.push(data.series[j].values[i]);
-  }
-}
 
-// Color scale
-var color = d3.scale.category20();
-var chartHeight = barHeight * zippedData.length + gapBetweenGroups * data.labels.length;
+//    var div = d3.select("div.chart").attr("class", "toolTip");
 
-var x = d3.scale.linear()
-    .domain([0, d3.max(zippedData)])
-    .range([0, chartWidth]);
+    var axisMargin = 20,
+            margin = 40,
+            valueMargin = 4,
+            width = parseInt(d3.select('body').style('width'), 10),
+            height = parseInt(d3.select('body').style('height'), 10),
+            barHeight = (height-axisMargin-margin*2)* 0.6/data.length,
+            barPadding = (height-axisMargin-margin*2)*0.4/data.length,
+            data, bar, svg, scale, xAxis, labelWidth = 0;
 
-var y = d3.scale.linear()
-    .range([chartHeight + gapBetweenGroups, 0]);
+    max = d3.max(data, function(d) { return d.value; });
 
-var yAxis = d3.svg.axis()
-    .scale(y)
-    .tickFormat('')
-    .tickSize(0)
-    .orient("left");
+    svg = d3.select('div.chart')
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height);
 
-// Specify the chart area and dimensions
-var chart = d3.select(".chart")
-    .attr("width", spaceForLabels + chartWidth + spaceForLegend)
-    .attr("height", chartHeight);
 
-// Create bars
-var bar = chart.selectAll("g")
-    .data(zippedData)
-    .enter().append("g")
-    .attr("transform", function(d, i) {
-      return "translate(" + spaceForLabels + "," + (i * barHeight + gapBetweenGroups * (0.5 + Math.floor(i/data.series.length))) + ")";
+    bar = svg.selectAll("g")
+            .data(data)
+            .enter()
+            .append("g");
+
+    bar.attr("class", "bar")
+            .attr("cx",0)
+            .attr("transform", function(d, i) {
+                return "translate(" + margin + "," + (i * (barHeight + barPadding) + barPadding) + ")";
+            });
+
+    bar.append("text")
+            .attr("class", "label")
+            .attr("y", barHeight / 2)
+            .attr("dy", ".35em") //vertical align middle
+            .text(function(d){
+                return d.label;
+            }).each(function() {
+        labelWidth = Math.ceil(Math.max(labelWidth, this.getBBox().width));
     });
 
-// Create rectangles of the correct width
-bar.append("rect")
-    .attr("fill", function(d,i) { return color(i % data.series.length); })
-    .attr("class", "bar")
-    .attr("width", x)
-    .attr("height", barHeight - 1);
+    scale = d3.scale.linear()
+            .domain([0, max])
+            .range([0, width - margin*2 - labelWidth]);
 
-// Add text label in bar
-bar.append("text")
-    .attr("x", function(d) { return x(d) - 3; })
-    .attr("y", barHeight / 2)
-    .attr("fill", "red")
-    .attr("dy", ".35em")
-    .text(function(d) { return d; });
+    xAxis = d3.svg.axis()
+            .scale(scale)
+            .tickSize(-height + 2*margin + axisMargin)
+            .orient("bottom");
 
-// Draw labels
-bar.append("text")
-    .attr("class", "label")
-    .attr("x", function(d) { return - 10; })
-    .attr("y", groupHeight / 2)
-    .attr("dy", ".35em")
-    .text(function(d,i) {
-      if (i % data.series.length === 0)
-        return data.labels[Math.floor(i/data.series.length)];
-      else
-        return ""});
+    bar.append("rect")
+            .attr("transform", "translate("+labelWidth+", 0)")
+            .attr("height", barHeight)
+            .attr("width", function(d){
+                return scale(d.value);
+            });
 
-chart.append("g")
-      .attr("class", "y axis")
-      .attr("transform", "translate(" + spaceForLabels + ", " + -gapBetweenGroups/2 + ")")
-      .call(yAxis);
+    bar.append("text")
+            .attr("class", "value")
+            .attr("y", barHeight / 2)
+            .attr("dx", -valueMargin + labelWidth) //margin right
+            .attr("dy", ".35em") //vertical align middle
+            .attr("text-anchor", "end")
+            .text(function(d){
+                return (d.value);
+            })
+            .attr("x", function(d){
+                var width = this.getBBox().width;
+                return Math.max(width + valueMargin, scale(d.value));
+            });
+/*
+    bar
+            .on("mousemove", function(d){
+                div.style("left", d3.event.pageX+10+"px");
+                div.style("top", d3.event.pageY-25+"px");
+                div.style("display", "inline-block");
+                div.html((d.label)+"<br>"+(d.value)+"%");
+            });
+    bar
+            .on("mouseout", function(d){
+                div.style("display", "none");
+            });
+*/
 
-// Draw legend
-var legendRectSize = 18,
-    legendSpacing  = 4;
-
-var legend = chart.selectAll('.legend')
-    .data(data.series)
-    .enter()
-    .append('g')
-    .attr('transform', function (d, i) {
-        var height = legendRectSize + legendSpacing;
-        var offset = -gapBetweenGroups/2;
-        var horz = spaceForLabels + chartWidth + 40 - legendRectSize;
-        var vert = i * height - offset;
-        return 'translate(' + horz + ',' + vert + ')';
-    });
-
-legend.append('rect')
-    .attr('width', legendRectSize)
-    .attr('height', legendRectSize)
-    .style('fill', function (d, i) { return color(i); })
-    .style('stroke', function (d, i) { return color(i); });
-
-legend.append('text')
-    .attr('class', 'legend')
-    .attr('x', legendRectSize + legendSpacing)
-    .attr('y', legendRectSize - legendSpacing)
-    .text(function (d) { return d.label; });
+    svg.insert("g",":first-child")
+            .attr("class", "axisHorizontal")
+            .attr("transform", "translate(" + (margin + labelWidth) + ","+ (height - axisMargin - margin)+")")
+            .call(xAxis);
 
 
 //]]>
