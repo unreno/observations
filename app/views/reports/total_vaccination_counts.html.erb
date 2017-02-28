@@ -1,0 +1,51 @@
+<style>
+table {
+	display:inline-block;
+	vertical-align: middle;
+}
+div#chart {
+	display:inline-block;
+	height:750px;
+	vertical-align: middle;
+}
+</style>
+
+<h1>Immunization Counts for all children born in 2015</h1>
+
+<table>
+<thead>
+	<tr>
+		<th>Vaccination</th>
+		<th>Count</th>
+	</tr>
+</thead>
+<tbody>
+<% @results.each do |result| %>
+	<tr>
+		<td><%= result.vaccination %></td>
+		<td><%= result.count %></td>
+	</tr>
+<% end %>
+</tbody>
+</table>
+
+<div id='chart' class='chart'>
+<!-- /the chart goes here -->
+</div>
+
+<script type="text/javascript">
+//<![CDATA[
+
+var data = [{
+	type: 'bar',
+	orientation: 'h'
+}];
+
+data[0].x = <%=@results.reverse.collect{|r| r.count }%>;
+data[0].y = [<%=@results.reverse.collect{|r|"\"#{r.vaccination}\""}.join(",").html_safe%>];
+
+Plotly.newPlot('chart', data);
+
+//]]>
+
+</script>
