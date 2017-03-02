@@ -39,7 +39,7 @@
 
 if ActiveRecord::Base.connection_config[:adapter] == 'sqlserver'
 	sql =<<-EOF
-	DECLARE @bulk_cmd VARCHAR(1000) = 'BULK INSERT dev.names
+	DECLARE @bulk_cmd VARCHAR(1000) = 'BULK INSERT observations
 	FROM ''misc/Observations-20161219.csv''
 	WITH (
 		FIELDTERMINATOR = '','',
