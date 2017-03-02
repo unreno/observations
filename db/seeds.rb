@@ -39,25 +39,27 @@
 
 if ActiveRecord::Base.connection_config[:adapter] == 'sqlserver'
 	sql =<<-EOF
-	DECLARE @bulk_cmd VARCHAR(1000) = 'BULK INSERT observations
-	FROM ''misc/Observations-20161219.csv''
-	WITH (
-		FIELDTERMINATOR = '','',
-		ROWTERMINATOR = ''\r\n'',
-		TABLOCK
-	)';
+	DECLARE @bulk_cmd VARCHAR(1000) = 'BULK INSERT observations 
+	FROM ''/home/jakewendt/github/unreno/observations/misc/Observations-20170302.tsv'' 
+	WITH ( ROWTERMINATOR = '''+CHAR(10)+''', FIRSTROW = 2, TABLOCK)';
 	EXEC(@bulk_cmd);
 	EOF
 	puts sql
-	ActiveRecord::Base.connection.execute(sql);
 elsif ActiveRecord::Base.connection_config[:adapter] == 'mysql2'
 	sql =<<-EOF
-	LOAD DATA LOCAL INFILE 'misc/Observations-20161219.csv' INTO TABLE observations
-	FIELDS TERMINATED BY ',' 
-	ENCLOSED BY '\"' 
+	LOAD DATA LOCAL INFILE 'misc/Observations-20170302.tsv' INTO TABLE observations
 	LINES TERMINATED BY '\r\n'
 	IGNORE 1 LINES;
 	EOF
 	puts sql
 end
+
+ActiveRecord::Base.connection.execute(sql);
+
+#USE [observations_production]
+#GO
+#DECLARE @bulk_cmd VARCHAR(1000) = 'BULK INSERT observations FROM ''/home/jakewendt/github/unreno/observations/misc/Observations-20170302.tsv'' WITH ( ROWTERMINATOR = '''+CHAR(10)+''', FIRSTROW = 2, TABLOCK)';
+#EXEC(@bulk_cmd);
+#GO
+
 

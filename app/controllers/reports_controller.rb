@@ -1,6 +1,6 @@
 class ReportsController < ApplicationController
-  def montly_birth_counts
-  end
+	def montly_birth_counts
+	end
 
 	def individual_vaccination_counts_by_month_year
 		@results = Observation.individual_vaccination_counts_by_month_year
