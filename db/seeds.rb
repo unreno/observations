@@ -47,6 +47,9 @@ if ActiveRecord::Base.connection_config[:adapter] == 'sqlserver'
 		TABLOCK
 	)';
 	EXEC(@bulk_cmd);
+	EOF
+	puts sql
+	ActiveRecord::Base.connection.execute(sql);
 elsif ActiveRecord::Base.connection_config[:adapter] == 'mysql2'
 	sql =<<-EOF
 	LOAD DATA LOCAL INFILE 'misc/Observations-20161219.csv' INTO TABLE observations
@@ -56,6 +59,5 @@ elsif ActiveRecord::Base.connection_config[:adapter] == 'mysql2'
 	IGNORE 1 LINES;
 	EOF
 	puts sql
-	ActiveRecord::Base.connection.execute(sql);
 end
 
