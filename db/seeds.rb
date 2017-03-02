@@ -36,14 +36,26 @@
 
 #	The above is just WAY TOO LONG. The following takes about 3 seconds.
 
-sql =<<EOF
-LOAD DATA LOCAL INFILE 'misc/Observations-20161219.csv' INTO TABLE observations
-FIELDS TERMINATED BY ',' 
-ENCLOSED BY '\"' 
-LINES TERMINATED BY '\r\n'
-IGNORE 1 LINES;
-EOF
-puts sql
-ActiveRecord::Base.connection.execute(sql);
 
+if ActiveRecord::Base.connection_config[:adapter] == 'sqlserver'
+	sql =<<-EOF
+	DECLARE @bulk_cmd VARCHAR(1000) = 'BULK INSERT dev.names
+	FROM ''misc/Observations-20161219.csv''
+	WITH (
+		FIELDTERMINATOR = '','',
+		ROWTERMINATOR = ''\r\n'',
+		TABLOCK
+	)';
+	EXEC(@bulk_cmd);
+elsif ActiveRecord::Base.connection_config[:adapter] == 'mysql2'
+	sql =<<-EOF
+	LOAD DATA LOCAL INFILE 'misc/Observations-20161219.csv' INTO TABLE observations
+	FIELDS TERMINATED BY ',' 
+	ENCLOSED BY '\"' 
+	LINES TERMINATED BY '\r\n'
+	IGNORE 1 LINES;
+	EOF
+	puts sql
+	ActiveRecord::Base.connection.execute(sql);
+end
 
