@@ -1,10 +1,10 @@
 Rails.application.routes.draw do
-#  get 'reports/montly_birth_counts'
 
 	resources :reports, only: :index do
 		collection do
 			get :individual_vaccination_counts_by_month_year
 			get :total_vaccination_counts
+			get :montly_birth_counts
 		end
 	end
 
