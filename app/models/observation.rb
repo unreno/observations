@@ -26,11 +26,12 @@ class Observation < ApplicationRecord
 			.project(o4[:started_at])
 			.project(o4[:value].as('vaccination'))
 			.distinct		#	done to drop any duplicates
-			.as('AS inside')
+			.as('inside')
 
 		inside = Arel::Table.new('inside')
 		#	SUM(CASE ... is not agnostic but seems to work on both MySQL/MariaDB and SQL Server!
-		outside_select = Observation.from(Arel.sql("(#{inside_select.to_sql})"))	# AS inside"))
+#		outside_select = Observation.from(Arel.sql("(#{inside_select.to_sql})"))	# AS inside"))
+		outside_select = Observation.from(inside_select.to_sql)
 			.group(inside[:chirp_id], inside[:dob])
 			.select(inside[:chirp_id], inside[:dob])
 			.project("SUM(CASE WHEN vaccination = 'DTAP' THEN 1 ELSE 0 END) AS dtap_count")
@@ -41,10 +42,11 @@ class Observation < ApplicationRecord
 			.project("SUM(CASE WHEN vaccination = 'IPV' THEN 1 ELSE 0 END) AS ipv_count")
 			.project("SUM(CASE WHEN vaccination = 'Rotavirus (2 dose)' THEN 1 ELSE 0 END) AS r2_count")
 			.project("SUM(CASE WHEN vaccination = 'Rotavirus (3 dose)' THEN 1 ELSE 0 END) AS r3_count")
-			.as('AS outside')
+			.as('outside')
 
 		outside = Arel::Table.new('outside')
-		xyz = Observation.from(Arel.sql("(#{outside_select.to_sql})"))	# AS outside"))
+#		xyz = Observation.from(Arel.sql("(#{outside_select.to_sql})"))	# AS outside"))
+		xyz = Observation.from(outside_select.to_sql)
 			.select(Arel.star)
 			.where(outside[:dtap_count].gteq(3))
 			.where(outside[:ipv_count].gteq(2))
