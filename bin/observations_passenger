@@ -1,0 +1,65 @@
+#!/bin/bash 
+
+
+#	Copy this script to /etc/init.d/
+#
+#	sudo cp $0 /etc/init.d/
+#	sudo update-rc.d observations_passenger defaults
+
+
+### BEGIN INIT INFO 
+# Provides:					Observations passenger
+# Default-Start:		 2 3 4 5 
+# Default-Stop:			0 1 6 
+# Required-Start:		$remote_fs $syslog
+# Required-Stop:		 $remote_fs $syslog
+# X-Interactive:		 true 
+# Short-Description: Start/stop observations web site 
+### END INIT INFO 
+
+PATH=/home/jakewendt/.local/bin:/home/jakewendt/.gem/ruby/2.3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+export GEM_HOME=/home/jakewendt/.gem/ruby/2.3
+PASSENGER=/home/jakewendt/.gem/ruby/2.3/bin/passenger
+ADDRESS=127.0.0.1 
+PORT=3000 
+RAILS_ENV=production
+ENVIRONMENT=production 
+APP=/home/jakewendt/observations
+#USER=ruby
+
+
+. /lib/lsb/init-functions 
+
+
+case "$1" in 
+	start) 
+		echo "Starting Observations passenger" 
+
+		#		iptables --policy INPUT ACCEPT
+		#	Be more specific
+		#iptables -A INPUT -p tcp --dport 3000 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
+
+		#	Already open, just redirect.
+		iptables -t nat -I PREROUTING -p tcp --dport 80 -j REDIRECT --to-ports 3000
+		cd $APP
+		cmd="$PASSENGER start --port $PORT --environment $ENVIRONMENT --daemonize"	# --max-pool-size 2"
+		echo $cmd
+		$cmd
+		;; 
+	stop) 
+		echo "Stopping Observations passenger" 
+		iptables -t nat -D PREROUTING -p tcp --dport 80 -j REDIRECT --to-ports 3000
+		cd $APP
+		cmd="$PASSENGER stop -p $PORT"
+		echo $cmd
+		$cmd
+		;; 
+	status)
+		#	From	/lib/lsb/init-functions 
+		status_of_proc -p $APP/tmp/pids/passenger.$PORT.pid "" "passenger" && exit 0 || exit $?
+		;;
+	*) 
+		echo "Usage: $0 start|stop|status" >&2 
+		exit 3 
+		;; 
+esac
