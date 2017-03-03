@@ -11,6 +11,8 @@ class Observation < ApplicationRecord
 		o3=o1.alias('o3')
 		o4=o1.alias('o4')
 
+#	NEED TO ADD THE DOB/VAC date comparison
+
 		inside_select = o1.outer_join(o2).on(o1[:chirp_id].eq(o2[:chirp_id]))
 			.outer_join(o3).on(o1[:chirp_id].eq(o3[:chirp_id]))
 			.outer_join(o4).on(o1[:chirp_id].eq(o4[:chirp_id]))
@@ -25,13 +27,22 @@ class Observation < ApplicationRecord
 			.project(o1[:value].as('dob'))
 			.project(o4[:started_at])
 			.project(o4[:value].as('vaccination'))
-			.distinct		#	done to drop any duplicates
-			.as('inside')
+			.group(o1[:chirp_id],o1[:value],o4[:started_at],o4[:value])	#	2571
+
+#			.distinct		#	done to drop any duplicates	#	2571
+
+		inside_select = if ActiveRecord::Base.connection_config[:adapter] == 'sqlserver'
+			inside_select.where(Arel.sql("[o4].[started_at] < DATEADD(month, 7, [observations].[value])"))
+		elsif ActiveRecord::Base.connection_config[:adapter] == 'mysql2'
+			inside_select.where(Arel.sql("`o4`.`started_at` < DATE_ADD(`observations`.`value`,INTERVAL 7 MONTH)"))
+		else
+			raise "I'm confused"
+		end
 
 		inside = Arel::Table.new('inside')
 		#	SUM(CASE ... is not agnostic but seems to work on both MySQL/MariaDB and SQL Server!
 #		outside_select = Observation.from(Arel.sql("(#{inside_select.to_sql})"))	# AS inside"))
-		outside_select = Observation.from(inside_select.to_sql)
+		outside_select = Observation.from(inside_select.as('inside').to_sql)
 			.group(inside[:chirp_id], inside[:dob])
 			.select(inside[:chirp_id], inside[:dob])
 			.project("SUM(CASE WHEN vaccination = 'DTAP' THEN 1 ELSE 0 END) AS dtap_count")
