@@ -77,7 +77,20 @@ class Observation < ApplicationRecord
 #	=> 2598!  Just like initial SQL Server query!
 #	However, now sql server on linux is taking 47 seconds!!!
 #	and mysql is taking only 9
+#	Now sql server is faster with casting of dob as date
+#	ActiveRecord::Base.connection.execute(sql);	#	only returns count on SQL Server?
+#	ActiveRecord::Base.connection.select_rows(sql);	#	returns an array of arrays (no fields)
+#	Neither are really any faster.
 #		Observation.find_by_sql(xyz)
+#	Use ActiveRecord::Base.connection.select_all(sql);	#	returns an array of arrays (no fields)
+#> results.columns
+#=> ["chirp_id", "dob", "dtap_count", "hepb_count", "hib2_count", "hib3_count", "pcv_count", "ipv_count", "r2_count", "r3_count"]
+#> results.rows.length
+#=> 2598
+#	Access like an array of hashes
+#> results[555]
+#=> {"chirp_id"=>12312341234123, "dob"=>Sat, 00 Xxx 2015, "dtap_count"=>3, "hepb_count"=>3, "hib2_count"=>0, "hib3_count"=>3, "pcv_count"=>3, "ipv_count"=>3, "r2_count"=>0, "r3_count"=>3}
+#	You don't even need to ".to_sql"
 	end
 
 	def self.expected_immunizations
