@@ -76,7 +76,10 @@ vi config/secret.yml
 cp config/database.yml.original config/database.yml
 vi config/database.yml
 
+FROM my mac ... scp github/unreno/observations/misc/Observations-20170302.tsv chirp:observations/misc/
 
+
+chmod 755 misc/Observations-20170302.tsv
 rake db:drop DISABLE_DATABASE_ENVIRONMENT_CHECK=1 ; rake db:create ; rake db:migrate ; rake db:seed
 
 sudo reboot
