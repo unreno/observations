@@ -24,14 +24,16 @@ class Observation < ApplicationRecord
 			.where(o3[:value].eq('Washoe'))
 			.where(o4[:concept].eq('vaccination_desc'))
 			.project(o1[:chirp_id])
-			.project(o1[:value].as('dob'))
+			.project("CAST( `observations`.`value` AS DATE ) AS dob")
 			.project(o4[:started_at])
 			.project(o4[:value].as('vaccination'))
 			.distinct		#	done to drop any duplicates
 
+#			.project(o1[:value].as('dob'))
 #			.group(o1[:chirp_id],o1[:value],o4[:started_at],o4[:value])
 
 		#	Make this a field rather than a condition to try to make faster???
+		#	Still take 47 seconds in sql server while mysql only takes 8???
 		inside_select = if ActiveRecord::Base.connection_config[:adapter] == 'sqlserver'
 #			inside_select.where(Arel.sql("[o4].[started_at] < DATEADD(month, 7, [observations].[value])"))
 			inside_select.project(Arel.sql("DATEADD(month, 7, [observations].[value]) AS dob7"))
