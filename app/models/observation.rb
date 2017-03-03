@@ -34,6 +34,8 @@ class Observation < ApplicationRecord
 
 		#	Make this a field rather than a condition to try to make faster???
 		#	Still take 47 seconds in sql server while mysql only takes 8???
+		#	I don't understand it, but CASTing dob to a DATE makes this faster?
+		#	I wouldn't have expected casting the field into another variable would affect the field?
 		inside_select = if ActiveRecord::Base.connection_config[:adapter] == 'sqlserver'
 			inside_select.where(Arel.sql("[o4].[started_at] < DATEADD(month, 7, [observations].[value])"))
 #			inside_select.project(Arel.sql("DATEADD(month, 7, [observations].[value]) AS dob7"))
