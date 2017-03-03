@@ -27,9 +27,9 @@ class Observation < ApplicationRecord
 			.project(o1[:value].as('dob'))
 			.project(o4[:started_at])
 			.project(o4[:value].as('vaccination'))
-			.group(o1[:chirp_id],o1[:value],o4[:started_at],o4[:value])	#	2571
+			.distinct		#	done to drop any duplicates
 
-#			.distinct		#	done to drop any duplicates	#	2571
+#			.group(o1[:chirp_id],o1[:value],o4[:started_at],o4[:value])
 
 		inside_select = if ActiveRecord::Base.connection_config[:adapter] == 'sqlserver'
 			inside_select.where(Arel.sql("[o4].[started_at] < DATEADD(month, 7, [observations].[value])"))
@@ -66,6 +66,9 @@ class Observation < ApplicationRecord
 			.where(outside[:hib2_count].gteq(2).or(outside[:hib3_count].gteq(3)))
 			.where(outside[:r2_count].gteq(2).or(outside[:r3_count].gteq(3)))
 
+#	=> 2598!  Just like initial SQL Server query!
+#	However, now sql server on linux is taking 47 seconds!!!
+#	and mysql is taking only 9
 #		Observation.find_by_sql(xyz)
 	end
 
