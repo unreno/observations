@@ -6,17 +6,11 @@ class Observation < ApplicationRecord
 	#	Its all behind the scenes so it really doesn't matter much.
 	#
 	def self.meddling
-		o1=Observation.arel_table # same as o1=Arel::Table.new('observations')
-#		o1.table_alias='o1'	#	don't do this.
-#		o1.project('*').to_sql
-#=> "SELECT * FROM `observations` `o1`"
+		o1=Observation.arel_table # same as o1=Arel::Table.new('observations'), can't alias
 		o2=o1.alias('o2')
-		o1.join(o2,Arel::Nodes::OuterJoin).on(o1[:chirp_id].eq(o2[:chirp_id])).to_sql
-#=> "SELECT FROM `observations` LEFT OUTER JOIN `observations` `o2` ON `observations`.`chirp_id` = `o2`.`chirp_id`"
-
 		o3=o1.alias('o3')
 		o4=o1.alias('o4')
-		o1.join(o2,Arel::Nodes::OuterJoin).on(o1[:chirp_id].eq(o2[:chirp_id]))
+		inside = o1.join(o2,Arel::Nodes::OuterJoin).on(o1[:chirp_id].eq(o2[:chirp_id]))
 			.join(o3,Arel::Nodes::OuterJoin).on(o1[:chirp_id].eq(o3[:chirp_id]))
 			.join(o4,Arel::Nodes::OuterJoin).on(o1[:chirp_id].eq(o4[:chirp_id]))
 			.where(o1[:concept].eq('DEM:DOB'))
@@ -28,26 +22,40 @@ class Observation < ApplicationRecord
 			.where(o4[:concept].eq('vaccination_desc'))
 			.project(o1[:chirp_id])
 			.project(o1[:value].as('dob'))
-			.group(o4[:chirp_id],o4[:value],o4[:started_at])	#	done to drop any duplicates
+			.project(o4[:started_at])
+			.project(o4[:value].as('vaccination'))
+			.project("SUM(CASE WHEN o4.value = 'DTAP' THEN 1 ELSE 0 END) AS dtap_count")
+			.project("SUM(CASE WHEN o4.value = 'Hep B' THEN 1 ELSE 0 END) AS hepb_count")
+			.project("SUM(CASE WHEN o4.value = 'HIB (2 dose)' THEN 1 ELSE 0 END) AS hib2_count")
+			.project("SUM(CASE WHEN o4.value = 'HIB' THEN 1 ELSE 0 END) AS hib3_count")
+			.project("SUM(CASE WHEN o4.value = 'PCV 13' THEN 1 ELSE 0 END) AS pcv_count")
+			.project("SUM(CASE WHEN o4.value = 'IPV' THEN 1 ELSE 0 END) AS ipv_count")
+			.project("SUM(CASE WHEN o4.value = 'Rotavirus (2 dose)' THEN 1 ELSE 0 END) AS r2_count")
+			.project("SUM(CASE WHEN o4.value = 'Rotavirus (3 dose)' THEN 1 ELSE 0 END) AS r3_count")
+			.distinct		#	done to drop any duplicates
+			.group(o4[:chirp_id],o4[:value])	#	for aggregating
 
+
+#			.group(o4[:chirp_id],o4[:value],o4[:started_at])	#	done to drop any duplicates
+
+#			.project("sum(case when `o4`.`value` = 'DTap' then 1 else 0 end) as dtap_count")
+#			.project("sum(case when `o4`.`value` = 'Hep B' then 1 else 0 end) as hepb_count")
+#			.project("sum(case when `o4`.`value` = 'IPV' then 1 else 0 end) as ipv_count")
+#			.take(100)
 #	This seems cleaner, but it does exactly the same thing
+#	However, it may be easier to nest.
 
 
-
-#		(o1=Observation.arel_table).table_alias='o1'
-#		o1=Observation.arel_table
-#		o1.alias('o1')
-#		o1.where(o1[:concept].eq('DEM:DOB')).to_sql
-#		#=>	"SELECT FROM `observations` `o1` WHERE `o1`.`concept` = 'DEM:DOB'"
-#		o1.where(o1[:concept].eq('DEM:DOB')).project('chirp_id').project('id').to_sql
-#		#=> "SELECT chirp_id, id FROM `observations` `o1` WHERE `o1`.`concept` = 'DEM:DOB'"
-#
 #		(o2=Observation.arel_table).table_alias='o2'
 #		o1.join(o2,Arel::Nodes::OuterJoin).on(o1[:chirp_id].eq(o2[:chirp_id])).to_sql
 ##=> "SELECT FROM `observations` `o2` LEFT OUTER JOIN `observations` `o2` ON `o2`.`chirp_id` = `o2`.`chirp_id`"
 #
 #	sql = Observation.expected_immunizations.to_sql
-#	Observation.from(Arel.sql("(#{sql}) as asdf")).group("chirp_id,dob").select('chirp_id, dob, SUM(dtap) AS dtap_count, SUM(hepb) AS hepb_count')
+#	INNER is sql reserved word. DON'T USE IT!
+#		Observation.from(Arel.sql("(#{inside.to_sql}) AS inside"))
+#			.group("chirp_id,dob")
+#			.select('chirp_id, dob')
+#			.select("SUM(CASE WHEN inside.vaccination = 'Hep B' THEN 1 ELSE 0 END) AS hepb_count")
 
 	end
 
