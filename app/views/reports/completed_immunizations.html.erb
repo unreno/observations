@@ -1,0 +1,70 @@
+<style>
+table {
+	display:inline-block;
+	vertical-align: middle;
+}
+div#chart {
+	display:inline-block;
+	height:750px;
+	width:800px;
+	vertical-align: middle;
+}
+</style>
+
+<h1>Completed Immunizations in 2015 after 7 months</h1>
+
+<table>
+<thead>
+	<tr>
+		<th>CHIRP ID</th>
+		<th>DTap</th>
+		<th>Heb B</th>
+		<th>HIB 2</th>
+		<th>HIB 3</th>
+		<th>IPV</th>
+		<th>PCV 13</th>
+		<th>Rotavirus 2</th>
+		<th>Rotavirus 3</th>
+	</tr>
+</thead>
+<tbody>
+<% @results.each do |result| %>
+	<tr>
+		<td><%= result['chirp_id'] %></td>
+		<td><%= result['dtap_count'] %></td>
+		<td><%= result['hepb_count'] %></td>
+		<td><%= result['hib2_count'] %></td>
+		<td><%= result['hib3_count'] %></td>
+		<td><%= result['ipv_count'] %></td>
+		<td><%= result['pcv_count'] %></td>
+		<td><%= result['r2_count'] %></td>
+		<td><%= result['r3_count'] %></td>
+	</tr>
+<% end %>
+</tbody>
+</table>
+
+<div id='chart' class='chart'>
+<!-- /the chart goes here -->
+</div>
+
+<script type="text/javascript">
+//<![CDATA[
+
+var data = [{
+	type: 'bar',
+	orientation: 'h'
+}];
+
+//data[0].x = <%#=@results.reverse.collect{|r| r.count }%>;
+//data[0].y = [<%#=@results.reverse.collect{|r|"\"#{r.vaccination}\""}.join(",").html_safe%>];
+
+Plotly.newPlot('chart', data, {
+	margin: {
+		l: 200,
+	}
+});
+
+//]]>
+
+</script>

@@ -3,8 +3,8 @@ class ReportsController < ApplicationController
 	def montly_birth_counts
 	end
 
-	def expected_immunizations
-		@results = Observation.expected_immunizations
+	def completed_immunizations
+		@results = ActiveRecord::Base.connection.select_all(Observation.completed_immunizations)
 	end
 
 	def individual_vaccination_counts_by_month_year

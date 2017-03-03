@@ -5,7 +5,7 @@ class Observation < ApplicationRecord
 	#	They REALLY don't want you to alias that first table.
 	#	Its all behind the scenes so it really doesn't matter much.
 	#
-	def self.meddling
+	def self.completed_immunizations
 		o1=Observation.arel_table # same as o1=Arel::Table.new('observations'), can't alias
 		o2=o1.alias('o2')
 		o3=o1.alias('o3')
@@ -93,85 +93,85 @@ class Observation < ApplicationRecord
 #	You don't even need to ".to_sql"
 	end
 
-	def self.expected_immunizations
-		o1at = Observation.arel_table	#	don't think that I can alias the initial table
-		o2at = Observation.arel_table.alias('o2')
-		o3at = Observation.arel_table.alias('o3')
-		o4at = Observation.arel_table.alias('o4')
-
-		results = Observation
-			.joins( Arel::Nodes::OuterJoin.new(o2at, Arel::Nodes::On.new(
-				o1at[:chirp_id].eq(o2at[:chirp_id])
-			)))
-			.joins( Arel::Nodes::OuterJoin.new(o3at, Arel::Nodes::On.new(
-				o1at[:chirp_id].eq(o3at[:chirp_id])
-			)))
-			.joins( Arel::Nodes::OuterJoin.new(o4at, Arel::Nodes::On.new(
-				o1at[:chirp_id].eq(o4at[:chirp_id])
-			)))
-			.where(o1at[:concept].eq('DEM:DOB'))
-			.where(o1at[:value].matches('2015%'))
-			.where(o2at[:concept].eq('birth_co'))
-			.where(o2at[:value].eq('Washoe'))
-			.where(o3at[:concept].eq('mom_rco'))
-			.where(o3at[:value].eq('Washoe'))
-			.where(o4at[:concept].eq('vaccination_desc'))
-			.select(o4at[:chirp_id])
-			.select(o4at[:value].as('dob'))
-			.group(o4at[:chirp_id],o4at[:value],o4at[:started_at])	#	done to drop any duplicates
-
-		#	Not agnostic :(
-		results = if ActiveRecord::Base.connection_config[:adapter] == 'sqlserver'
-			results.where("[o4].[started_at] < DATEADD(month, 7, [observations].[value])")
-				.select("CASE WHEN o4.value = 'Hep B' THEN 1 ELSE 0 END AS hepb")
-				.select("CASE WHEN o4.value = 'DTAP' THEN 1 ELSE 0 END AS dtap")
-				.select("CASE WHEN o4.value = 'HIB (2 dose)' THEN 1 ELSE 0 END AS hib2")
-				.select("CASE WHEN o4.value = 'HIB (3 dose)' THEN 1 ELSE 0 END AS hib3")
-				.select("CASE WHEN o4.value = 'PCV 13' THEN 1 ELSE 0 END AS pcv")
-				.select("CASE WHEN o4.value = 'IPV' THEN 1 ELSE 0 END AS ipv")
-				.select("CASE WHEN o4.value = 'Rotavirus (2 dose)' THEN 1 ELSE 0 END AS r2")
-				.select("CASE WHEN o4.value = 'Rotavirus (3 dose)' THEN 1 ELSE 0 END AS r3")
-		elsif ActiveRecord::Base.connection_config[:adapter] == 'mysql2'
-			results.where("`o4`.`started_at` < DATE_ADD(`observations`.`value`,INTERVAL 7 MONTH)")
-				.select("IF( o4.value = 'Hep B', 1, 0 ) AS hepb")
-				.select("IF( o4.value = 'DTAP', 1, 0 ) AS dtap")
-				.select("IF( o4.value = 'HIB (2 dose)', 1, 0 ) AS hib2")
-				.select("IF( o4.value = 'HIB (3 dose)', 1, 0 ) AS hib3")
-				.select("IF( o4.value = 'PCV 13', 1, 0 ) AS pcv")
-				.select("IF( o4.value = 'IPV', 1, 0 ) AS ipv")
-				.select("IF( o4.value = 'Rotavirus (2 dose)', 1, 0 ) AS r2")
-				.select("IF( o4.value = 'Rotavirus (3 dose)', 1, 0 ) AS r3")
-		else
-			raise "I'm confused"
-		end
-
-
-#	sql = Observation.expected_immunizations.to_sql
-#	Observation.from(Arel.sql("(#{sql}) as asdf")).group("chirp_id,dob").select('chirp_id, dob, SUM(dtap) AS dtap_count, SUM(hepb) AS hepb_count')
-
-
-#DROP TABLE tempjoins;
+#	def self.expected_immunizations
+#		o1at = Observation.arel_table	#	don't think that I can alias the initial table
+#		o2at = Observation.arel_table.alias('o2')
+#		o3at = Observation.arel_table.alias('o3')
+#		o4at = Observation.arel_table.alias('o4')
 #
-#CREATE TEMPORARY TABLE tempjoins AS 
-#SELECT chirp_id, dob, SUM(dtap) AS dtap_count, SUM(hepb) AS hepb_count,
-#	SUM(hib2) AS hib2_count, SUM(hib3) AS hib3_count, SUM(pcv) AS pcv_count,
-#	SUM(ipv) AS ipv_count, SUM(r2) AS r2_count, SUM(r3) AS r3_count
-#FROM (
-
-
-#) xyz
-#GROUP BY chirp_id, dob;
+#		results = Observation
+#			.joins( Arel::Nodes::OuterJoin.new(o2at, Arel::Nodes::On.new(
+#				o1at[:chirp_id].eq(o2at[:chirp_id])
+#			)))
+#			.joins( Arel::Nodes::OuterJoin.new(o3at, Arel::Nodes::On.new(
+#				o1at[:chirp_id].eq(o3at[:chirp_id])
+#			)))
+#			.joins( Arel::Nodes::OuterJoin.new(o4at, Arel::Nodes::On.new(
+#				o1at[:chirp_id].eq(o4at[:chirp_id])
+#			)))
+#			.where(o1at[:concept].eq('DEM:DOB'))
+#			.where(o1at[:value].matches('2015%'))
+#			.where(o2at[:concept].eq('birth_co'))
+#			.where(o2at[:value].eq('Washoe'))
+#			.where(o3at[:concept].eq('mom_rco'))
+#			.where(o3at[:value].eq('Washoe'))
+#			.where(o4at[:concept].eq('vaccination_desc'))
+#			.select(o4at[:chirp_id])
+#			.select(o4at[:value].as('dob'))
+#			.group(o4at[:chirp_id],o4at[:value],o4at[:started_at])	#	done to drop any duplicates
 #
-#SELECT *
-#FROM tempjoins
-#WHERE dtap_count >= 3
-#	AND ipv_count >= 2
-#	AND pcv_count >= 3 
-#	AND hepb_count >= 2
-#	AND ( hib2_count >= 2 OR hib3_count >= 3 )
-#	AND ( r2_count >= 2 OR r3_count >= 3 );
-
-	end
+#		#	Not agnostic :(
+#		results = if ActiveRecord::Base.connection_config[:adapter] == 'sqlserver'
+#			results.where("[o4].[started_at] < DATEADD(month, 7, [observations].[value])")
+#				.select("CASE WHEN o4.value = 'Hep B' THEN 1 ELSE 0 END AS hepb")
+#				.select("CASE WHEN o4.value = 'DTAP' THEN 1 ELSE 0 END AS dtap")
+#				.select("CASE WHEN o4.value = 'HIB (2 dose)' THEN 1 ELSE 0 END AS hib2")
+#				.select("CASE WHEN o4.value = 'HIB (3 dose)' THEN 1 ELSE 0 END AS hib3")
+#				.select("CASE WHEN o4.value = 'PCV 13' THEN 1 ELSE 0 END AS pcv")
+#				.select("CASE WHEN o4.value = 'IPV' THEN 1 ELSE 0 END AS ipv")
+#				.select("CASE WHEN o4.value = 'Rotavirus (2 dose)' THEN 1 ELSE 0 END AS r2")
+#				.select("CASE WHEN o4.value = 'Rotavirus (3 dose)' THEN 1 ELSE 0 END AS r3")
+#		elsif ActiveRecord::Base.connection_config[:adapter] == 'mysql2'
+#			results.where("`o4`.`started_at` < DATE_ADD(`observations`.`value`,INTERVAL 7 MONTH)")
+#				.select("IF( o4.value = 'Hep B', 1, 0 ) AS hepb")
+#				.select("IF( o4.value = 'DTAP', 1, 0 ) AS dtap")
+#				.select("IF( o4.value = 'HIB (2 dose)', 1, 0 ) AS hib2")
+#				.select("IF( o4.value = 'HIB (3 dose)', 1, 0 ) AS hib3")
+#				.select("IF( o4.value = 'PCV 13', 1, 0 ) AS pcv")
+#				.select("IF( o4.value = 'IPV', 1, 0 ) AS ipv")
+#				.select("IF( o4.value = 'Rotavirus (2 dose)', 1, 0 ) AS r2")
+#				.select("IF( o4.value = 'Rotavirus (3 dose)', 1, 0 ) AS r3")
+#		else
+#			raise "I'm confused"
+#		end
+#
+#
+##	sql = Observation.expected_immunizations.to_sql
+##	Observation.from(Arel.sql("(#{sql}) as asdf")).group("chirp_id,dob").select('chirp_id, dob, SUM(dtap) AS dtap_count, SUM(hepb) AS hepb_count')
+#
+#
+##DROP TABLE tempjoins;
+##
+##CREATE TEMPORARY TABLE tempjoins AS 
+##SELECT chirp_id, dob, SUM(dtap) AS dtap_count, SUM(hepb) AS hepb_count,
+##	SUM(hib2) AS hib2_count, SUM(hib3) AS hib3_count, SUM(pcv) AS pcv_count,
+##	SUM(ipv) AS ipv_count, SUM(r2) AS r2_count, SUM(r3) AS r3_count
+##FROM (
+#
+#
+##) xyz
+##GROUP BY chirp_id, dob;
+##
+##SELECT *
+##FROM tempjoins
+##WHERE dtap_count >= 3
+##	AND ipv_count >= 2
+##	AND pcv_count >= 3 
+##	AND hepb_count >= 2
+##	AND ( hib2_count >= 2 OR hib3_count >= 3 )
+##	AND ( r2_count >= 2 OR r3_count >= 3 );
+#
+#	end
 
 
 	def self.total_vaccination_counts
