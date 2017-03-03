@@ -10,7 +10,7 @@ Rails.application.routes.draw do
 	end
 
 	# For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
-	resources :observations, only: :index
+#	resources :observations, only: :index
 
 	root :to => "reports#index"
 #	root :to => "observations#index"
