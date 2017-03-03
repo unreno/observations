@@ -31,10 +31,13 @@ class Observation < ApplicationRecord
 
 #			.group(o1[:chirp_id],o1[:value],o4[:started_at],o4[:value])
 
+		#	Make this a field rather than a condition to try to make faster???
 		inside_select = if ActiveRecord::Base.connection_config[:adapter] == 'sqlserver'
-			inside_select.where(Arel.sql("[o4].[started_at] < DATEADD(month, 7, [observations].[value])"))
+#			inside_select.where(Arel.sql("[o4].[started_at] < DATEADD(month, 7, [observations].[value])"))
+			inside_select.project(Arel.sql("DATEADD(month, 7, [observations].[value]) AS dob7"))
 		elsif ActiveRecord::Base.connection_config[:adapter] == 'mysql2'
-			inside_select.where(Arel.sql("`o4`.`started_at` < DATE_ADD(`observations`.`value`,INTERVAL 7 MONTH)"))
+#			inside_select.where(Arel.sql("`o4`.`started_at` < DATE_ADD(`observations`.`value`,INTERVAL 7 MONTH)"))
+			inside_select.project(Arel.sql("DATE_ADD(`observations`.`value`,INTERVAL 7 MONTH) AS dob7"))
 		else
 			raise "I'm confused"
 		end
@@ -53,6 +56,7 @@ class Observation < ApplicationRecord
 			.project("SUM(CASE WHEN vaccination = 'IPV' THEN 1 ELSE 0 END) AS ipv_count")
 			.project("SUM(CASE WHEN vaccination = 'Rotavirus (2 dose)' THEN 1 ELSE 0 END) AS r2_count")
 			.project("SUM(CASE WHEN vaccination = 'Rotavirus (3 dose)' THEN 1 ELSE 0 END) AS r3_count")
+			.where(inside[:started_at].lt(inside[:dob7]))
 			.as('outside')
 
 		outside = Arel::Table.new('outside')
