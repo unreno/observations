@@ -62,7 +62,7 @@ class Observation < ApplicationRecord
 			.where(outside[:dtap_count].gteq(3))
 			.where(outside[:ipv_count].gteq(2))
 			.where(outside[:pcv_count].gteq(3))
-			.where(outside[:hepb_count].gteq(3))
+			.where(outside[:hepb_count].gteq(2))
 			.where(outside[:hib2_count].gteq(2).or(outside[:hib3_count].gteq(3)))
 			.where(outside[:r2_count].gteq(2).or(outside[:r3_count].gteq(3)))
 
