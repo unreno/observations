@@ -10,9 +10,12 @@ class Observation < ApplicationRecord
 		o2=o1.alias('o2')
 		o3=o1.alias('o3')
 		o4=o1.alias('o4')
-		inside = o1.join(o2,Arel::Nodes::OuterJoin).on(o1[:chirp_id].eq(o2[:chirp_id]))
-			.join(o3,Arel::Nodes::OuterJoin).on(o1[:chirp_id].eq(o3[:chirp_id]))
-			.join(o4,Arel::Nodes::OuterJoin).on(o1[:chirp_id].eq(o4[:chirp_id]))
+#		inside = o1.join(o2,Arel::Nodes::OuterJoin).on(o1[:chirp_id].eq(o2[:chirp_id]))
+#			.join(o3,Arel::Nodes::OuterJoin).on(o1[:chirp_id].eq(o3[:chirp_id]))
+#			.join(o4,Arel::Nodes::OuterJoin).on(o1[:chirp_id].eq(o4[:chirp_id]))
+		inside = o1.outer_join(o2).on(o1[:chirp_id].eq(o2[:chirp_id]))
+			.outer_join(o3).on(o1[:chirp_id].eq(o3[:chirp_id]))
+			.outer_join(o4).on(o1[:chirp_id].eq(o4[:chirp_id]))
 			.where(o1[:concept].eq('DEM:DOB'))
 			.where(o1[:value].matches('2015%'))
 			.where(o2[:concept].eq('birth_co'))
@@ -27,7 +30,6 @@ class Observation < ApplicationRecord
 			.distinct		#	done to drop any duplicates
 
 #			.group(o4[:chirp_id],o4[:value])	#	for aggregating
-
 
 #			.group(o4[:chirp_id],o4[:value],o4[:started_at])	#	done to drop any duplicates
 
@@ -45,7 +47,8 @@ class Observation < ApplicationRecord
 #
 #	sql = Observation.expected_immunizations.to_sql
 #	INNER is sql reserved word. DON'T USE IT!
-		Observation.from(Arel.sql("(#{inside.to_sql}) AS inside"))
+#	SUM(CASE ... is not agnostic but seems to work on both MySQL/MariaDB and SQL Server!
+		outside = Observation.from(Arel.sql("(#{inside.to_sql}) AS inside"))
 			.group("chirp_id,dob")
 			.select('chirp_id, dob')
 			.project("SUM(CASE WHEN vaccination = 'DTAP' THEN 1 ELSE 0 END) AS dtap_count")
@@ -57,6 +60,7 @@ class Observation < ApplicationRecord
 			.project("SUM(CASE WHEN vaccination = 'Rotavirus (2 dose)' THEN 1 ELSE 0 END) AS r2_count")
 			.project("SUM(CASE WHEN vaccination = 'Rotavirus (3 dose)' THEN 1 ELSE 0 END) AS r3_count")
 
+#		Observation.find_by_sql(outside)
 	end
 
 	def self.expected_immunizations
@@ -82,8 +86,8 @@ class Observation < ApplicationRecord
 			.where(o3at[:concept].eq('mom_rco'))
 			.where(o3at[:value].eq('Washoe'))
 			.where(o4at[:concept].eq('vaccination_desc'))
-			.select(o1at[:chirp_id])
-			.select(o1at[:value].as('dob'))
+			.select(o4at[:chirp_id])
+			.select(o4at[:value].as('dob'))
 			.group(o4at[:chirp_id],o4at[:value],o4at[:started_at])	#	done to drop any duplicates
 
 		#	Not agnostic :(
