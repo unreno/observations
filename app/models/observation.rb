@@ -10,10 +10,8 @@ class Observation < ApplicationRecord
 		o2=o1.alias('o2')
 		o3=o1.alias('o3')
 		o4=o1.alias('o4')
-#		inside = o1.join(o2,Arel::Nodes::OuterJoin).on(o1[:chirp_id].eq(o2[:chirp_id]))
-#			.join(o3,Arel::Nodes::OuterJoin).on(o1[:chirp_id].eq(o3[:chirp_id]))
-#			.join(o4,Arel::Nodes::OuterJoin).on(o1[:chirp_id].eq(o4[:chirp_id]))
-		inside = o1.outer_join(o2).on(o1[:chirp_id].eq(o2[:chirp_id]))
+
+		inside_select = o1.outer_join(o2).on(o1[:chirp_id].eq(o2[:chirp_id]))
 			.outer_join(o3).on(o1[:chirp_id].eq(o3[:chirp_id]))
 			.outer_join(o4).on(o1[:chirp_id].eq(o4[:chirp_id]))
 			.where(o1[:concept].eq('DEM:DOB'))
@@ -28,29 +26,13 @@ class Observation < ApplicationRecord
 			.project(o4[:started_at])
 			.project(o4[:value].as('vaccination'))
 			.distinct		#	done to drop any duplicates
+			.as('inside')
 
-#			.group(o4[:chirp_id],o4[:value])	#	for aggregating
-
-#			.group(o4[:chirp_id],o4[:value],o4[:started_at])	#	done to drop any duplicates
-
-#			.project("sum(case when `o4`.`value` = 'DTap' then 1 else 0 end) as dtap_count")
-#			.project("sum(case when `o4`.`value` = 'Hep B' then 1 else 0 end) as hepb_count")
-#			.project("sum(case when `o4`.`value` = 'IPV' then 1 else 0 end) as ipv_count")
-#			.take(100)
-#	This seems cleaner, but it does exactly the same thing
-#	However, it may be easier to nest.
-
-
-#		(o2=Observation.arel_table).table_alias='o2'
-#		o1.join(o2,Arel::Nodes::OuterJoin).on(o1[:chirp_id].eq(o2[:chirp_id])).to_sql
-##=> "SELECT FROM `observations` `o2` LEFT OUTER JOIN `observations` `o2` ON `o2`.`chirp_id` = `o2`.`chirp_id`"
-#
-#	sql = Observation.expected_immunizations.to_sql
-#	INNER is sql reserved word. DON'T USE IT!
-#	SUM(CASE ... is not agnostic but seems to work on both MySQL/MariaDB and SQL Server!
-		outside = Observation.from(Arel.sql("(#{inside.to_sql}) AS inside"))
-			.group("chirp_id,dob")
-			.select('chirp_id, dob')
+		inside = Arel::Table.new('inside')
+		#	SUM(CASE ... is not agnostic but seems to work on both MySQL/MariaDB and SQL Server!
+		outside_select = Observation.from(Arel.sql("(#{inside_select.to_sql})"))	# AS inside"))
+			.group(inside[:chirp_id], inside[:dob])
+			.select(inside[:chirp_id], inside[:dob])
 			.project("SUM(CASE WHEN vaccination = 'DTAP' THEN 1 ELSE 0 END) AS dtap_count")
 			.project("SUM(CASE WHEN vaccination = 'Hep B' THEN 1 ELSE 0 END) AS hepb_count")
 			.project("SUM(CASE WHEN vaccination = 'HIB (2 dose)' THEN 1 ELSE 0 END) AS hib2_count")
@@ -59,8 +41,19 @@ class Observation < ApplicationRecord
 			.project("SUM(CASE WHEN vaccination = 'IPV' THEN 1 ELSE 0 END) AS ipv_count")
 			.project("SUM(CASE WHEN vaccination = 'Rotavirus (2 dose)' THEN 1 ELSE 0 END) AS r2_count")
 			.project("SUM(CASE WHEN vaccination = 'Rotavirus (3 dose)' THEN 1 ELSE 0 END) AS r3_count")
+			.as('outside')
 
-#		Observation.find_by_sql(outside)
+		outside = Arel::Table.new('outside')
+		xyz = Observation.from(Arel.sql("(#{outside_select.to_sql})"))	# AS outside"))
+			.select(Arel.star)
+			.where(outside[:dtap_count].gteq(3))
+			.where(outside[:ipv_count].gteq(2))
+			.where(outside[:pcv_count].gteq(3))
+			.where(outside[:hepb_count].gteq(3))
+			.where(outside[:hib2_count].gteq(2).or(outside[:hib3_count].gteq(3)))
+			.where(outside[:r2_count].gteq(2).or(outside[:r3_count].gteq(3)))
+
+#		Observation.find_by_sql(xyz)
 	end
 
 	def self.expected_immunizations
