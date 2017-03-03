@@ -24,16 +24,9 @@ class Observation < ApplicationRecord
 			.project(o1[:value].as('dob'))
 			.project(o4[:started_at])
 			.project(o4[:value].as('vaccination'))
-			.project("SUM(CASE WHEN o4.value = 'DTAP' THEN 1 ELSE 0 END) AS dtap_count")
-			.project("SUM(CASE WHEN o4.value = 'Hep B' THEN 1 ELSE 0 END) AS hepb_count")
-			.project("SUM(CASE WHEN o4.value = 'HIB (2 dose)' THEN 1 ELSE 0 END) AS hib2_count")
-			.project("SUM(CASE WHEN o4.value = 'HIB' THEN 1 ELSE 0 END) AS hib3_count")
-			.project("SUM(CASE WHEN o4.value = 'PCV 13' THEN 1 ELSE 0 END) AS pcv_count")
-			.project("SUM(CASE WHEN o4.value = 'IPV' THEN 1 ELSE 0 END) AS ipv_count")
-			.project("SUM(CASE WHEN o4.value = 'Rotavirus (2 dose)' THEN 1 ELSE 0 END) AS r2_count")
-			.project("SUM(CASE WHEN o4.value = 'Rotavirus (3 dose)' THEN 1 ELSE 0 END) AS r3_count")
 			.distinct		#	done to drop any duplicates
-			.group(o4[:chirp_id],o4[:value])	#	for aggregating
+
+#			.group(o4[:chirp_id],o4[:value])	#	for aggregating
 
 
 #			.group(o4[:chirp_id],o4[:value],o4[:started_at])	#	done to drop any duplicates
@@ -52,10 +45,17 @@ class Observation < ApplicationRecord
 #
 #	sql = Observation.expected_immunizations.to_sql
 #	INNER is sql reserved word. DON'T USE IT!
-#		Observation.from(Arel.sql("(#{inside.to_sql}) AS inside"))
-#			.group("chirp_id,dob")
-#			.select('chirp_id, dob')
-#			.select("SUM(CASE WHEN inside.vaccination = 'Hep B' THEN 1 ELSE 0 END) AS hepb_count")
+		Observation.from(Arel.sql("(#{inside.to_sql}) AS inside"))
+			.group("chirp_id,dob")
+			.select('chirp_id, dob')
+			.project("SUM(CASE WHEN vaccination = 'DTAP' THEN 1 ELSE 0 END) AS dtap_count")
+			.project("SUM(CASE WHEN vaccination = 'Hep B' THEN 1 ELSE 0 END) AS hepb_count")
+			.project("SUM(CASE WHEN vaccination = 'HIB (2 dose)' THEN 1 ELSE 0 END) AS hib2_count")
+			.project("SUM(CASE WHEN vaccination = 'HIB' THEN 1 ELSE 0 END) AS hib3_count")
+			.project("SUM(CASE WHEN vaccination = 'PCV 13' THEN 1 ELSE 0 END) AS pcv_count")
+			.project("SUM(CASE WHEN vaccination = 'IPV' THEN 1 ELSE 0 END) AS ipv_count")
+			.project("SUM(CASE WHEN vaccination = 'Rotavirus (2 dose)' THEN 1 ELSE 0 END) AS r2_count")
+			.project("SUM(CASE WHEN vaccination = 'Rotavirus (3 dose)' THEN 1 ELSE 0 END) AS r3_count")
 
 	end
 
