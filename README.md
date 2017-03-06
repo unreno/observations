@@ -84,3 +84,30 @@ rake db:drop DISABLE_DATABASE_ENVIRONMENT_CHECK=1 ; rake db:create ; rake db:mig
 
 sudo reboot
 
+
+
+
+
+### Updating
+
+
+After an update, restarting or stopping/starting sometimes takes a very long time.
+The system seems to run out of memory because something is buffered or cached.
+One of the following helps. Not sure which yet though.
+
+```BASH
+sudo service observations_passenger stop
+
+
+sudo sh -c "free && sync && echo 1 > /proc/sys/vm/drop_caches && free"
+
+sudo sh -c "free && sync && echo 2 > /proc/sys/vm/drop_caches && free"
+
+sudo sh -c "free && sync && echo 3 > /proc/sys/vm/drop_caches && free"
+
+
+sudo service observations_passenger start
+```
+
+
+
