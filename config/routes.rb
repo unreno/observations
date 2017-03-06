@@ -11,6 +11,7 @@ Rails.application.routes.draw do
 
 	# For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 #	resources :observations, only: :index
+	resources :observations, only: :index, defaults: { format: :json }
 
 	root :to => "reports#index"
 #	root :to => "observations#index"

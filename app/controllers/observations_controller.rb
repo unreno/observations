@@ -4,10 +4,17 @@ class ObservationsController < ApplicationController
 	# GET /observations
 	# GET /observations.json
 	def index
-		@observations = Observation.paginate(
-				:per_page => params[:per_page]||100,
-				:page		 => valid_find_page
-			)
+		#	NO HTML ACCESS
+		respond_to do |format|
+			format.html { render :plain => "JSON Access Only" }
+			format.json { 
+				@observations = Observation.paginate(
+						:per_page => params[:per_page]||10,
+						:page		 => valid_find_page
+					)
+				head :no_content 
+			}
+		end
 	end
 
 #	# GET /observations/1
