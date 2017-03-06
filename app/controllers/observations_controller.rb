@@ -12,7 +12,6 @@ class ObservationsController < ApplicationController
 						:per_page => params[:per_page]||10,
 						:page		 => valid_find_page
 					)
-				head :no_content 
 			}
 		end
 	end
