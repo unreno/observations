@@ -64,7 +64,7 @@ GEM
     docile (1.1.5)
     erubis (2.7.0)
     execjs (2.7.0)
-    ffi (1.9.17)
+    ffi (1.9.18)
     ffi-compiler (1.0.1)
       ffi (>= 1.0.0)
       rake
@@ -182,7 +182,7 @@ GEM
     turbolinks-source (5.0.0)
     tzinfo (1.2.2)
       thread_safe (~> 0.1)
-    uglifier (3.1.2)
+    uglifier (3.1.4)
       execjs (>= 0.3.0, < 3)
     web-console (3.4.0)
       actionview (>= 5.0)
@@ -227,4 +227,4 @@ DEPENDENCIES
   will_paginate
 
 BUNDLED WITH
-   1.14.5
+   1.14.6
