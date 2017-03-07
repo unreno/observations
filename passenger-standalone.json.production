@@ -1,0 +1,13 @@
+{
+	"environment": "production",
+	"port": 3000,
+	"daemonize": true,
+	"ssl": true,
+	"ssl_port": 443,
+	"ssl_certificate": "/home/jakewendt/chirp.acs.unr.edu.public.certificate.pem",
+	"ssl_certificate_key": "/home/jakewendt/chirp.acs.unr.edu.private.key.pem",
+	"nginx_config_template": "nginx.config.erb",
+}
+#	Sadly, can't redirect 80 to 443 from here so sticking with 3000.
+#	NEED the nginx.config.erb
+#	NOTE: run `passenger start --debug-nginx-config` to display parsed template

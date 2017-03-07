@@ -31,26 +31,37 @@ APP=/home/jakewendt/observations
 . /lib/lsb/init-functions 
 
 
+
+#	Some of these settings are in the passenger-standalone.json or nginx.config.erg now.
+
+#	KEEP the PORT variable though as it is used in the "status" command.
+
+
+
 case "$1" in 
 	start) 
 		echo "Starting Observations passenger" 
+		cd $APP
+#		cmd="$PASSENGER start --port $PORT --environment $ENVIRONMENT --daemonize"	# --max-pool-size 2"
+		cmd="$PASSENGER start"
+		echo $cmd
+		$cmd
 
+		#	Modify the iptables AFTER, just in case passenger fails
+		#	We end up with MANY rerouting lines in the iptables
 		#		iptables --policy INPUT ACCEPT
 		#	Be more specific
 		#iptables -A INPUT -p tcp --dport 3000 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
 
 		#	Already open, just redirect.
 		iptables -t nat -I PREROUTING -p tcp --dport 80 -j REDIRECT --to-ports 3000
-		cd $APP
-		cmd="$PASSENGER start --port $PORT --environment $ENVIRONMENT --daemonize"	# --max-pool-size 2"
-		echo $cmd
-		$cmd
 		;; 
 	stop) 
 		echo "Stopping Observations passenger" 
 		iptables -t nat -D PREROUTING -p tcp --dport 80 -j REDIRECT --to-ports 3000
 		cd $APP
-		cmd="$PASSENGER stop -p $PORT"
+#		cmd="$PASSENGER stop -p $PORT"
+		cmd="$PASSENGER stop"
 		echo $cmd
 		$cmd
 		;; 
