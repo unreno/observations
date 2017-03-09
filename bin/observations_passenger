@@ -5,6 +5,10 @@
 #
 #	sudo cp $0 /etc/init.d/
 #	sudo update-rc.d observations_passenger defaults
+#
+#	If updating, will need to run ...
+#
+#	systemctl daemon-reload
 
 
 ### BEGIN INIT INFO 
@@ -43,6 +47,7 @@ case "$1" in
 		echo "Starting Observations passenger" 
 		cd $APP
 #		cmd="$PASSENGER start --port $PORT --environment $ENVIRONMENT --daemonize"	# --max-pool-size 2"
+#		settings in passenger-standalone.json
 		cmd="$PASSENGER start"
 		echo $cmd
 		$cmd
@@ -61,6 +66,7 @@ case "$1" in
 		iptables -t nat -D PREROUTING -p tcp --dport 80 -j REDIRECT --to-ports 3000
 		cd $APP
 #		cmd="$PASSENGER stop -p $PORT"
+#		settings in passenger-standalone.json
 		cmd="$PASSENGER stop"
 		echo $cmd
 		$cmd
