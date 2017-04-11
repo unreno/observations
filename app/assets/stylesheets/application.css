@@ -13,3 +13,15 @@
  *= require_tree .
  *= require_self
  */
+
+
+table {
+	display:inline-block;
+	vertical-align: middle;
+}
+div#chart {
+	display:inline-block;
+	height:750px;
+	width:800px;
+	vertical-align: middle;
+}
