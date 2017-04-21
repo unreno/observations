@@ -20,3 +20,8 @@
 /coverage/
 /config/database.yml
 /config/secrets.yml
+
+/nginx.config.erb
+/passenger-standalone.json
+/passenger.3000.pid
+/passenger.3000.pid.lock
