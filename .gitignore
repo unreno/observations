@@ -25,3 +25,6 @@
 /passenger-standalone.json
 /passenger.3000.pid
 /passenger.3000.pid.lock
+/ssl_stuff
+/mysql_*
+/mssql_*
