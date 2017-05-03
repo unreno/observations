@@ -23,4 +23,16 @@ class ReportsController < ApplicationController
 		@results = Observation.birth_weight_to_mom_age
 	end
 
+	def birth_weight_group_to_prenatal_care
+		@results = Observation.birth_weight_group_to_prenatal_care
+	end
+
+	def birth_weight_group_to_alcohol_use
+		@results = Observation.birth_weight_group_to_alcohol_use
+	end
+
+	def birth_weight_group_to_drug_use
+		@results = Observation.birth_weight_group_to_drug_use
+	end
+
 end

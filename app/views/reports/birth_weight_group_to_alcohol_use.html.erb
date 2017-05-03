@@ -1,0 +1,58 @@
+<h1>Birth Weight Group to Alcohol Use</h1>
+
+<table>
+<thead>
+	<tr>
+		<th>Weight Group</th>
+		<th>Alcohol Use</th>
+		<th>Count</th>
+	</tr>
+</thead>
+<tbody>
+<% @results.each do |result| %>
+	<tr>
+		<td><%= result.bwt_grp %></td>
+		<td><%= result.alcohol_use %></td>
+		<td><%= result.count %></td>
+	</tr>
+<% end %>
+</tbody>
+</table>
+
+<div id='chart' class='chart'>
+<!-- /the chart goes here -->
+</div>
+
+<p><%= @results.to_sql %></p>
+
+
+
+
+<script type="text/javascript">
+//<![CDATA[
+
+var groups = [<%=@results.collect{|r| "\"#{r.bwt_grp}\"" }.uniq.join(",").html_safe %>];
+
+var yes = {
+	x: groups,
+	y: <%=@results.select{|r| r.alcohol_use == 'Yes' }.collect{|r| r.count } %>,
+	name: 'Yes',
+	type: 'bar'
+};
+
+var no = {
+	x: groups,
+	y: <%=@results.select{|r| r.alcohol_use == 'No' }.collect{|r| r.count } %>,
+	name: 'No',
+	type: 'bar'
+};
+
+var data = [yes, no];
+
+var layout = {barmode: 'group'};
+
+Plotly.newPlot('chart', data, layout);
+
+//]]>
+
+</script>
