@@ -1,8 +1,5 @@
 class ReportsController < ApplicationController
 
-	def montly_birth_counts
-	end
-
 	def completed_immunizations
 		@query = Observation.completed_immunizations
 		@results = ActiveRecord::Base.connection.select_all( @query )
