@@ -1,0 +1,44 @@
+<h1>Birth Weight to Mom Age</h1>
+
+<table>
+<thead>
+	<tr>
+		<th>Weight</th>
+		<th>Mom Age</th>
+	</tr>
+</thead>
+<tbody>
+<% @results.each do |result| %>
+	<tr>
+		<td><%= result.weight %></td>
+		<td><%= result.mom_age %></td>
+	</tr>
+<% end %>
+</tbody>
+</table>
+
+<div id='chart' class='chart'>
+<!-- /the chart goes here -->
+</div>
+
+<p><%= @results.to_sql %></p>
+
+
+
+
+<script type="text/javascript">
+//<![CDATA[
+
+var data = [{
+	mode: 'markers',
+	type: 'scatter'
+}];
+
+data[0].x = <%=@results.collect{|r| r.weight }%>;
+data[0].y = <%=@results.collect{|r| r.mom_age }%>;
+
+Plotly.newPlot('chart', data);
+
+//]]>
+
+</script>

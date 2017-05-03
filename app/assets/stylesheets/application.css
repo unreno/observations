@@ -17,11 +17,11 @@
 
 table {
 	display:inline-block;
-	vertical-align: middle;
+	vertical-align: top;
 }
 div#chart {
 	display:inline-block;
 	height:750px;
 	width:800px;
-	vertical-align: middle;
+	vertical-align: top;
 }

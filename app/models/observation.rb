@@ -180,30 +180,41 @@ class Observation < ApplicationRecord
 
 		#	why union? Just do multiple queries and join the results in ruby
 
+		#	using a union will allow for passing the sql to the view, if so desired
+		#	Sadly, union seems to drop where condition values?
+
+#			.select("'Total Distinct CHIRP IDs' AS vaccination, COUNT( DISTINCT chirp_id ) AS count")
 		observations = Observation
 			.where(o1at[:concept].eq('DEM:DOB'))
 			.where(o1at[:value].matches('2015%'))
-			.select("'Total Distinct CHIRP IDs' AS vaccination, COUNT( DISTINCT chirp_id ) AS count")
+			.select("'Total Distinct CHIRP IDs' AS vaccination")
+			.select( o1at[:chirp_id].count(:distinct).as('count') )
 			.to_a
 
+#			.select("'CHIRP IDs with WebIZ Match' AS vaccination, COUNT( DISTINCT o2.chirp_id ) AS count")
+#			.joins( Arel::Nodes::OuterJoin.new(o2at, Arel::Nodes::On.new(
+#				o1at[:chirp_id].eq(o2at[:chirp_id])
+#			)))
 		observations += Observation
-			.joins( Arel::Nodes::OuterJoin.new(o2at, Arel::Nodes::On.new(
-				o1at[:chirp_id].eq(o2at[:chirp_id])
-			)))
+			.joins( outer( o2at, o1at[:chirp_id].eq(o2at[:chirp_id]) ) )
 			.where(o1at[:concept].eq('DEM:DOB'))
 			.where(o1at[:value].matches('2015%'))
 			.where(o2at[:concept].eq('vaccination_desc'))
-			.select("'CHIRP IDs with WebIZ Match' AS vaccination, COUNT( DISTINCT o2.chirp_id ) AS count")
+			.select("'CHIRP IDs with WebIZ Match' AS vaccination")
+			.select( o1at[:chirp_id].count(:distinct).as('count') )
 			.to_a
 
+#			.select(o2at[:value].as('vaccination'),"COUNT( DISTINCT o2.chirp_id ) AS count")
+#			.joins( Arel::Nodes::OuterJoin.new(o2at, Arel::Nodes::On.new(
+#				o1at[:chirp_id].eq(o2at[:chirp_id])
+#			)))
 		observations += Observation
-			.joins( Arel::Nodes::OuterJoin.new(o2at, Arel::Nodes::On.new(
-				o1at[:chirp_id].eq(o2at[:chirp_id])
-			)))
+			.joins( outer( o2at, o1at[:chirp_id].eq(o2at[:chirp_id]) ) )
 			.where(o1at[:concept].eq('DEM:DOB'))
 			.where(o1at[:value].matches('2015%'))
 			.where(o2at[:concept].eq('vaccination_desc'))
-			.select(o2at[:value].as('vaccination'),"COUNT( DISTINCT o2.chirp_id ) AS count")
+			.select(o2at[:value].as('vaccination'))
+			.select(o2at[:chirp_id].count(:distinct).as('count') )
 			.group(o2at[:value])
 
 		observations.sort_by{|o| o.count }.reverse
@@ -219,13 +230,15 @@ class Observation < ApplicationRecord
 		year_vac = Arel::Nodes::NamedFunction.new("YEAR", [o3at[:started_at]], "year")
 		month_vac = Arel::Nodes::NamedFunction.new("MONTH", [o3at[:started_at]], "month")
 
+#			.joins( Arel::Nodes::OuterJoin.new(o2at, Arel::Nodes::On.new(
+#				o1at[:chirp_id].eq(o2at[:chirp_id])
+#			)))
+#			.joins( Arel::Nodes::OuterJoin.new(o3at, Arel::Nodes::On.new(
+#				o1at[:chirp_id].eq(o3at[:chirp_id])
+#			)))
 		results = Observation
-			.joins( Arel::Nodes::OuterJoin.new(o2at, Arel::Nodes::On.new(
-				o1at[:chirp_id].eq(o2at[:chirp_id])
-			)))
-			.joins( Arel::Nodes::OuterJoin.new(o3at, Arel::Nodes::On.new(
-				o1at[:chirp_id].eq(o3at[:chirp_id])
-			)))
+			.joins( outer(o2at, o1at[:chirp_id].eq(o2at[:chirp_id])))
+			.joins( outer(o3at, o1at[:chirp_id].eq(o3at[:chirp_id])))
 			.where(o1at[:concept].eq('DEM:DOB'))
 			.where(o1at[:value].matches('2015%'))
 			.where(o2at[:concept].eq('birth_co'))
@@ -234,7 +247,39 @@ class Observation < ApplicationRecord
 			.group( group_year_vac, group_month_vac )
 			.order( group_year_vac, group_month_vac )
 			.select( year_vac, month_vac )
-			.select("COUNT(1) AS count")
+			.select( o1at[:chirp_id].count.as('count') )
+
+#			.select(o1at[:chirp_id].count.as('count'))
+#	SAME AS ??
+#			.select("COUNT(1) AS count")
+
+#	DO NOT DO (syntactically correct, but statistically wrong)
+#			.select(o1at[:chirp_id].count(:distinct).as('count'))
+	end
+
+	def self.birth_weight_to_mom_age
+		o1at = Observation.arel_table	#	don't think that I can alias the initial table
+		o2at = Observation.arel_table.alias('o2')
+
+#		Observation
+#			.joins( Arel::Nodes::OuterJoin.new(o2at, Arel::Nodes::On.new(
+#				o1at[:chirp_id].eq(o2at[:chirp_id])
+#			)))
+
+		weight = Arel::Nodes::NamedFunction.new("CAST", [o1at[:value].as("INT")], "weight")
+		mom_age = Arel::Nodes::NamedFunction.new("CAST", [o2at[:value].as("INT")], "mom_age")
+
+		Observation
+			.joins( outer(o2at, o1at[:chirp_id].eq(o2at[:chirp_id]) ))
+			.where( o1at[:concept].eq 'DEM:Weight' )
+			.where( o1at[:units].eq 'grams' )
+			.where( o1at[:source_table].eq 'births' )
+			.where( o2at[:concept].eq 'mom_age' )
+			.where( o2at[:source_table].eq 'births' )
+			.select( weight, mom_age )
+
+#			.select( o1at[:value].as('weight') )
+#			.select( o2at[:value].as('mom_age') )
 	end
 
 end
