@@ -40,7 +40,7 @@
 
 <script type="text/javascript">
 //<![CDATA[
-
+/*
 var data = [{
 	type: 'bar',
 	orientation: 'h'
@@ -49,12 +49,14 @@ var data = [{
 //data[0].x = <%#=@results.reverse.collect{|r| r.count }%>;
 //data[0].y = [<%#=@results.reverse.collect{|r|"\"#{r.vaccination}\""}.join(",").html_safe%>];
 
-Plotly.newPlot('chart', data, {
+var layout = {
 	margin: {
 		l: 200,
 	}
-});
+};
 
+Plotly.newPlot('chart', data, layout);
+*/
 //]]>
 
 </script>

@@ -30,13 +30,22 @@
 
 var data = [{
 	type: 'bar',
-	orientation: 'h'
+	orientation: 'h',
+	x: <%=@results.reverse.collect{|r| r.count }%>,
+	y: [<%=@results.reverse.collect{|r|"\"#{r.month}/#{r.year}\""}.join(",").html_safe%>]
 }];
 
-data[0].x = <%=@results.reverse.collect{|r| r.count }%>;
-data[0].y = [<%=@results.reverse.collect{|r|"\"#{r.month}/#{r.year}\""}.join(",").html_safe%>];
+var layout = {
+	title: 'Vaccinations for those born in 2015',
+	xaxis: {
+		title: 'Count'
+	},
+	yaxis: {
+		title: 'Month'
+	}
+};
 
-Plotly.newPlot('chart', data);
+Plotly.newPlot('chart', data, layout);
 
 //]]>
 

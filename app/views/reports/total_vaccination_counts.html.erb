@@ -28,17 +28,25 @@
 
 var data = [{
 	type: 'bar',
-	orientation: 'h'
+	orientation: 'h',
+	x: <%=@results.reverse.collect{|r| r.count }%>,
+	y: [<%=@results.reverse.collect{|r|"\"#{r.vaccination}\""}.join(",").html_safe%>]
 }];
 
-data[0].x = <%=@results.reverse.collect{|r| r.count }%>;
-data[0].y = [<%=@results.reverse.collect{|r|"\"#{r.vaccination}\""}.join(",").html_safe%>];
-
-Plotly.newPlot('chart', data, {
+var layout = {
+	title: 'Total Vaccinations for those born in 2015',
+	xaxis: {
+		title: 'Count'
+	},
+	yaxis: {
+		title: 'Vaccination'
+	},
 	margin: {
 		l: 200,
 	}
-});
+};
+
+Plotly.newPlot('chart', data, layout);
 
 //]]>
 

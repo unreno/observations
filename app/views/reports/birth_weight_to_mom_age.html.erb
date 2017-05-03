@@ -31,13 +31,23 @@
 
 var data = [{
 	mode: 'markers',
-	type: 'scatter'
+	type: 'scatter',
+	x: <%=@results.collect{|r| r.weight }%>,
+	y: <%=@results.collect{|r| r.mom_age }%>
 }];
 
-data[0].x = <%=@results.collect{|r| r.weight }%>;
-data[0].y = <%=@results.collect{|r| r.mom_age }%>;
+var layout = {
+	barmode: 'group',
+	title: 'Birth Weight to Mom Age',
+	xaxis: {
+		title: 'Birth Weight'
+	},
+	yaxis: {
+		title: 'Mom Age'
+	}
+};
 
-Plotly.newPlot('chart', data);
+Plotly.newPlot('chart', data, layout);
 
 //]]>
 

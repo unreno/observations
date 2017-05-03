@@ -49,7 +49,17 @@ var no = {
 
 var data = [yes, no];
 
-var layout = {barmode: 'group'};
+var layout = {
+	barmode: 'group',
+	title: 'Birth Weight Group to Alcohol Use',
+	xaxis: {
+		title: 'Birth Weight Group'
+	},
+	yaxis: {
+		title: 'Count'
+	}
+
+};
 
 Plotly.newPlot('chart', data, layout);
 
