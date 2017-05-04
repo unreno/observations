@@ -278,82 +278,164 @@ class Observation < ApplicationRecord
 			.select( weight, mom_age )
 	end
 
-	def self.birth_weight_group_to_prenatal_care
+#	def self.birth_weight_group_to_prenatal_care
+#		o1at = Observation.arel_table	#	don't think that I can alias the initial table
+#		o2at = Observation.arel_table.alias('o2')
+#		o3at = Observation.arel_table.alias('o3')
+#
+#		Observation
+#			.joins( outer(o2at, o1at[:chirp_id].eq(o2at[:chirp_id]) ))
+#			.joins( outer(o3at, o1at[:chirp_id].eq(o3at[:chirp_id]) ))
+#			.where( o1at[:concept].eq 'bwt_grp' )
+#			.where( o1at[:source_table].eq 'births' )
+#			.where( o2at[:concept].eq 'prenatal' )
+#			.where( o2at[:value].in ['Yes','No'] )
+#			.where( o2at[:source_table].eq 'births' )
+#			.where( o3at[:concept].eq('birth_co') )
+#			.where( o3at[:value].eq('Washoe') )
+#			.group( o1at[:value], o2at[:value] )
+#			.select( o1at[:value].as('bwt_grp'), o2at[:value].as('prenatal') )
+#			.select( o1at[:chirp_id].count(:distinct).as('count'))
+#	end
+#
+#	def self.birth_weight_group_to_alcohol_use
+#		o1at = Observation.arel_table	#	don't think that I can alias the initial table
+#		o2at = Observation.arel_table.alias('o2')
+#		o3at = Observation.arel_table.alias('o3')
+#
+#		Observation
+#			.joins( outer(o2at, o1at[:chirp_id].eq(o2at[:chirp_id]) ))
+#			.joins( outer(o3at, o1at[:chirp_id].eq(o3at[:chirp_id]) ))
+#			.where( o1at[:concept].eq 'bwt_grp' )
+#			.where( o1at[:source_table].eq 'births' )
+#			.where( o2at[:concept].eq 'alcohol' )
+#			.where( o2at[:value].in ['Yes','No'] )
+#			.where( o2at[:source_table].eq 'births' )
+#			.where( o3at[:concept].eq('birth_co') )
+#			.where( o3at[:value].eq('Washoe') )
+#			.group( o1at[:value], o2at[:value] )
+#			.select( o1at[:value].as('bwt_grp'), o2at[:value].as('alcohol_use') )
+#			.select( o1at[:chirp_id].count(:distinct).as('count'))
+#	end
+#
+#	def self.birth_weight_group_to_tobacco_use
+#		o1at = Observation.arel_table	#	don't think that I can alias the initial table
+#		o2at = Observation.arel_table.alias('o2')
+#		o3at = Observation.arel_table.alias('o3')
+#
+#		Observation
+#			.joins( outer(o2at, o1at[:chirp_id].eq(o2at[:chirp_id]) ))
+#			.joins( outer(o3at, o1at[:chirp_id].eq(o3at[:chirp_id]) ))
+#			.where( o1at[:concept].eq 'bwt_grp' )
+#			.where( o1at[:source_table].eq 'births' )
+#			.where( o2at[:concept].eq 'tobacco' )
+#			.where( o2at[:value].in ['Yes','No'] )
+#			.where( o2at[:source_table].eq 'births' )
+#			.where( o3at[:concept].eq('birth_co') )
+#			.where( o3at[:value].eq('Washoe') )
+#			.group( o1at[:value], o2at[:value] )
+#			.select( o1at[:value].as('bwt_grp'), o2at[:value].as('tobacco_use') )
+#			.select( o1at[:chirp_id].count(:distinct).as('count'))
+#	end
+#
+#	def self.birth_weight_group_to_prescription_drug_use
+#		o1at = Observation.arel_table	#	don't think that I can alias the initial table
+#		o2at = Observation.arel_table.alias('o2')
+#		o3at = Observation.arel_table.alias('o3')
+#
+#		Observation
+#			.joins( outer(o2at, o1at[:chirp_id].eq(o2at[:chirp_id]) ))
+#			.joins( outer(o3at, o1at[:chirp_id].eq(o3at[:chirp_id]) ))
+#			.where( o1at[:concept].eq 'bwt_grp' )
+#			.where( o1at[:source_table].eq 'births' )
+#			.where( o2at[:concept].eq 'du_prscr' )
+#			.where( o2at[:source_table].eq 'births' )
+#			.where( o3at[:concept].eq('birth_co') )
+#			.where( o3at[:value].eq('Washoe') )
+#			.group( o1at[:value], o2at[:value] )
+#			.select( o1at[:value].as('bwt_grp'), o2at[:value].as('prescription_drug_use') )
+#			.select( o1at[:chirp_id].count(:distinct).as('count'))
+#	end
+#
+#	def self.birth_weight_group_to_otc_drug_use
+#		o1at = Observation.arel_table	#	don't think that I can alias the initial table
+#		o2at = Observation.arel_table.alias('o2')
+#		o3at = Observation.arel_table.alias('o3')
+#
+#		Observation
+#			.joins( outer(o2at, o1at[:chirp_id].eq(o2at[:chirp_id]) ))
+#			.joins( outer(o3at, o1at[:chirp_id].eq(o3at[:chirp_id]) ))
+#			.where( o1at[:concept].eq 'bwt_grp' )
+#			.where( o1at[:source_table].eq 'births' )
+#			.where( o2at[:concept].eq 'du_otc' )
+#			.where( o2at[:source_table].eq 'births' )
+#			.where( o3at[:concept].eq('birth_co') )
+#			.where( o3at[:value].eq('Washoe') )
+#			.group( o1at[:value], o2at[:value] )
+#			.select( o1at[:value].as('bwt_grp'), o2at[:value].as('otc_drug_use') )
+#			.select( o1at[:chirp_id].count(:distinct).as('count'))
+#	end
+#
+#	def self.birth_weight_group_to_drug_use
+#		o1at = Observation.arel_table	#	don't think that I can alias the initial table
+#		o2at = Observation.arel_table.alias('o2')
+#		o3at = Observation.arel_table.alias('o3')
+#
+#		Observation
+#			.joins( outer(o2at, o1at[:chirp_id].eq(o2at[:chirp_id]) ))
+#			.joins( outer(o3at, o1at[:chirp_id].eq(o3at[:chirp_id]) ))
+#			.where( o1at[:concept].eq 'bwt_grp' )
+#			.where( o1at[:source_table].eq 'births' )
+#			.where( o2at[:concept].eq 'drug_use' )
+#			.where( o2at[:value].in ['Yes','No'] )
+#			.where( o2at[:source_table].eq 'births' )
+#			.where( o3at[:concept].eq('birth_co') )
+#			.where( o3at[:value].eq('Washoe') )
+#			.group( o1at[:value], o2at[:value] )
+#			.select( o1at[:value].as('bwt_grp'), o2at[:value].as('drug_use') )
+#			.select( o1at[:chirp_id].count(:distinct).as('count'))
+#	end
+#
+#	def self.birth_weight_group_to_source_pay
+#		o1at = Observation.arel_table	#	don't think that I can alias the initial table
+#		o2at = Observation.arel_table.alias('o2')
+#		o3at = Observation.arel_table.alias('o3')
+#
+#		Observation
+#			.joins( outer(o2at, o1at[:chirp_id].eq(o2at[:chirp_id]) ))
+#			.joins( outer(o3at, o1at[:chirp_id].eq(o3at[:chirp_id]) ))
+#			.where( o1at[:concept].eq 'bwt_grp' )
+#			.where( o1at[:source_table].eq 'births' )
+#			.where( o2at[:concept].eq 'source_pay' )
+#			.where( o2at[:source_table].eq 'births' )
+#			.where( o3at[:concept].eq('birth_co') )
+#			.where( o3at[:value].eq('Washoe') )
+#			.group( o1at[:value], o2at[:value] )
+#			.select( o1at[:value].as('bwt_grp'), o2at[:value].as('source_pay') )
+#			.select( o1at[:chirp_id].count(:distinct).as('count'))
+#	end
+
+
+
+
+	def self.birth_weight_group_to( field, as = nil )
 		o1at = Observation.arel_table	#	don't think that I can alias the initial table
 		o2at = Observation.arel_table.alias('o2')
 		o3at = Observation.arel_table.alias('o3')
+
+		as = field unless as.present?
 
 		Observation
 			.joins( outer(o2at, o1at[:chirp_id].eq(o2at[:chirp_id]) ))
 			.joins( outer(o3at, o1at[:chirp_id].eq(o3at[:chirp_id]) ))
 			.where( o1at[:concept].eq 'bwt_grp' )
 			.where( o1at[:source_table].eq 'births' )
-			.where( o2at[:concept].eq 'prenatal' )
-			.where( o2at[:value].in ['Yes','No'] )
+			.where( o2at[:concept].eq field )
 			.where( o2at[:source_table].eq 'births' )
 			.where( o3at[:concept].eq('birth_co') )
 			.where( o3at[:value].eq('Washoe') )
 			.group( o1at[:value], o2at[:value] )
-			.select( o1at[:value].as('bwt_grp'), o2at[:value].as('prenatal') )
-			.select( o1at[:chirp_id].count(:distinct).as('count'))
-	end
-
-	def self.birth_weight_group_to_alcohol_use
-		o1at = Observation.arel_table	#	don't think that I can alias the initial table
-		o2at = Observation.arel_table.alias('o2')
-		o3at = Observation.arel_table.alias('o3')
-
-		Observation
-			.joins( outer(o2at, o1at[:chirp_id].eq(o2at[:chirp_id]) ))
-			.joins( outer(o3at, o1at[:chirp_id].eq(o3at[:chirp_id]) ))
-			.where( o1at[:concept].eq 'bwt_grp' )
-			.where( o1at[:source_table].eq 'births' )
-			.where( o2at[:concept].eq 'alcohol' )
-			.where( o2at[:value].in ['Yes','No'] )
-			.where( o2at[:source_table].eq 'births' )
-			.where( o3at[:concept].eq('birth_co') )
-			.where( o3at[:value].eq('Washoe') )
-			.group( o1at[:value], o2at[:value] )
-			.select( o1at[:value].as('bwt_grp'), o2at[:value].as('alcohol_use') )
-			.select( o1at[:chirp_id].count(:distinct).as('count'))
-	end
-
-	def self.birth_weight_group_to_drug_use
-		o1at = Observation.arel_table	#	don't think that I can alias the initial table
-		o2at = Observation.arel_table.alias('o2')
-		o3at = Observation.arel_table.alias('o3')
-
-		Observation
-			.joins( outer(o2at, o1at[:chirp_id].eq(o2at[:chirp_id]) ))
-			.joins( outer(o3at, o1at[:chirp_id].eq(o3at[:chirp_id]) ))
-			.where( o1at[:concept].eq 'bwt_grp' )
-			.where( o1at[:source_table].eq 'births' )
-			.where( o2at[:concept].eq 'drug_use' )
-			.where( o2at[:value].in ['Yes','No'] )
-			.where( o2at[:source_table].eq 'births' )
-			.where( o3at[:concept].eq('birth_co') )
-			.where( o3at[:value].eq('Washoe') )
-			.group( o1at[:value], o2at[:value] )
-			.select( o1at[:value].as('bwt_grp'), o2at[:value].as('drug_use') )
-			.select( o1at[:chirp_id].count(:distinct).as('count'))
-	end
-
-	def self.birth_weight_group_to_source_pay
-		o1at = Observation.arel_table	#	don't think that I can alias the initial table
-		o2at = Observation.arel_table.alias('o2')
-		o3at = Observation.arel_table.alias('o3')
-
-		Observation
-			.joins( outer(o2at, o1at[:chirp_id].eq(o2at[:chirp_id]) ))
-			.joins( outer(o3at, o1at[:chirp_id].eq(o3at[:chirp_id]) ))
-			.where( o1at[:concept].eq 'bwt_grp' )
-			.where( o1at[:source_table].eq 'births' )
-			.where( o2at[:concept].eq 'source_pay' )
-			.where( o2at[:source_table].eq 'births' )
-			.where( o3at[:concept].eq('birth_co') )
-			.where( o3at[:value].eq('Washoe') )
-			.group( o1at[:value], o2at[:value] )
-			.select( o1at[:value].as('bwt_grp'), o2at[:value].as('source_pay') )
+			.select( o1at[:value].as('bwt_grp'), o2at[:value] )
 			.select( o1at[:chirp_id].count(:distinct).as('count'))
 	end
 

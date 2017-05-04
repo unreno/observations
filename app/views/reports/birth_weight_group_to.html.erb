@@ -1,4 +1,4 @@
-<h1>Birth Weight Group to Drug Use</h1>
+<h1>Birth Weight Group to <%=@value%></h1>
 
 <% 
 	order = [ "Very Low Birth Weight (<1,500g)", "Low Birth Weight (>=1,500g, <2,500g)", "Normal Birth Weight (>=2,500g, <=8,000g)" ]
@@ -9,7 +9,7 @@
 <thead>
 	<tr>
 		<th>Weight Group</th>
-		<th>Drug Use</th>
+		<th><%=@value%></th>
 		<th>Count</th>
 	</tr>
 </thead>
@@ -17,7 +17,7 @@
 <% sorted_results.each do |result| %>
 	<tr>
 		<td><%= result.bwt_grp %></td>
-		<td><%= result.drug_use %></td>
+		<td><%= result.value %></td>
 		<td><%= result.count %></td>
 	</tr>
 <% end %>
@@ -37,26 +37,26 @@
 //<![CDATA[
 
 var groups = [<%=sorted_results.collect{|r| "\"#{r.bwt_grp}\"" }.uniq.join(",").html_safe %>];
+var values = [<%=sorted_results.collect{|r| "\"#{r.value}\"" }.uniq.join(",").html_safe %>];
 
-var yes = {
-	x: groups,
-	y: <%=sorted_results.select{|r| r.drug_use == 'Yes' }.collect{|r| r.count } %>,
-	name: 'Yes',
-	type: 'bar'
-};
+//	escape otherwise the less than's and greater thans are converted to \u00...
+var js_sorted_results = <%=ActiveSupport.escape_html_entities_in_json = false;sorted_results.to_json.html_safe%>;
 
-var no = {
-	x: groups,
-	y: <%=sorted_results.select{|r| r.drug_use == 'No' }.collect{|r| r.count } %>,
-	name: 'No',
-	type: 'bar'
-};
-
-var data = [yes, no];
-
+var data = [];
+for( i=0; i<=values.length; i++ ){
+	data[i] = {
+		x: groups,
+		y: js_sorted_results.filter( function(result) { 
+					return result.value == values[i]; 
+				}).map( function(result){ 
+					return result.count }),
+		name: values[i],
+		type: 'bar'
+	}
+}
 var layout = {
 	barmode: 'group',
-	title: 'Birth Weight Group to Drug Use',
+	title: 'Birth Weight Group to <%=@value%>',
 	xaxis: {
 		title: 'Birth Weight Group'
 	},

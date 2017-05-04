@@ -21,19 +21,45 @@ class ReportsController < ApplicationController
 	end
 
 	def birth_weight_group_to_prenatal_care
-		@results = Observation.birth_weight_group_to_prenatal_care
+		@value = 'Prenatal Care'
+		@results = Observation.birth_weight_group_to('prenatal')
+		render action: 'birth_weight_group_to'
 	end
 
 	def birth_weight_group_to_alcohol_use
-		@results = Observation.birth_weight_group_to_alcohol_use
+		@value = 'Alcohol Use'
+		@results = Observation.birth_weight_group_to('alcohol')
+		render action: 'birth_weight_group_to'
 	end
 
 	def birth_weight_group_to_drug_use
-		@results = Observation.birth_weight_group_to_drug_use
+		@value = 'Drug Use'
+		@results = Observation.birth_weight_group_to('drug_use')
+		render action: 'birth_weight_group_to'
+	end
+
+	def birth_weight_group_to_otc_drug_use
+		@value = 'OTC Drug Use'
+		@results = Observation.birth_weight_group_to('du_otc')
+		render action: 'birth_weight_group_to'
+	end
+
+	def birth_weight_group_to_prescription_drug_use
+		@value = 'Prescription Drug Use'
+		@results = Observation.birth_weight_group_to('du_prscr')
+		render action: 'birth_weight_group_to'
 	end
 
 	def birth_weight_group_to_source_pay
-		@results = Observation.birth_weight_group_to_source_pay
+		@value = 'Source Pay'
+		@results = Observation.birth_weight_group_to('source_pay')
+		render action: 'birth_weight_group_to'
+	end
+
+	def birth_weight_group_to_tobacco_use
+		@value = 'Tobacco Use'
+		@results = Observation.birth_weight_group_to('tobacco')
+		render action: 'birth_weight_group_to'
 	end
 
 end
