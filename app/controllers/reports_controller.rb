@@ -10,9 +10,6 @@ class ReportsController < ApplicationController
 	end
 
 	def total_vaccination_counts
-#		query = Observation.total_vaccination_counts
-#		@sql = query.to_sql
-#		@results = query.sort_by{|o| o.count }.reverse
 		@results = Observation.total_vaccination_counts
 	end
 

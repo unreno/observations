@@ -94,40 +94,81 @@ class Observation < ApplicationRecord
 	end
 
 	def self.total_vaccination_counts
+#		o1at = Observation.arel_table	#	don't think that I can alias the initial table
+#		o2at = Observation.arel_table.alias('o2')
+#
+#		#	why union? Just do multiple queries and join the results in ruby
+#
+#		#	using a union will allow for passing the sql to the view, if so desired
+#		#	Sadly, union seems to drop where condition values?
+#
+#		observations = Observation
+#			.where(o1at[:concept].eq('DEM:DOB'))
+#			.where(o1at[:value].matches('2015%'))
+#			.select("'Total Distinct CHIRP IDs' AS vaccination")
+#			.select( o1at[:chirp_id].count(:distinct).as('count') )
+#			.to_a
+#
+#		observations += Observation
+#			.joins( outer( o2at, o1at[:chirp_id].eq(o2at[:chirp_id]) ) )
+#			.where(o1at[:concept].eq('DEM:DOB'))
+#			.where(o1at[:value].matches('2015%'))
+#			.where(o2at[:concept].eq('vaccination_desc'))
+#			.select("'CHIRP IDs with WebIZ Match' AS vaccination")
+#			.select( o1at[:chirp_id].count(:distinct).as('count') )
+#			.to_a
+#
+#		observations += Observation
+#			.joins( outer( o2at, o1at[:chirp_id].eq(o2at[:chirp_id]) ) )
+#			.where(o1at[:concept].eq('DEM:DOB'))
+#			.where(o1at[:value].matches('2015%'))
+#			.where(o2at[:concept].eq('vaccination_desc'))
+#			.select(o2at[:value].as('vaccination'))
+#			.select(o2at[:chirp_id].count(:distinct).as('count') )
+#			.group(o2at[:value])
+#
+#		observations.sort_by{|o| o.count }.reverse
+
+
 		o1at = Observation.arel_table	#	don't think that I can alias the initial table
 		o2at = Observation.arel_table.alias('o2')
 
-		#	why union? Just do multiple queries and join the results in ruby
-
-		#	using a union will allow for passing the sql to the view, if so desired
-		#	Sadly, union seems to drop where condition values?
-
-		observations = Observation
+		o1 = o1at
 			.where(o1at[:concept].eq('DEM:DOB'))
 			.where(o1at[:value].matches('2015%'))
-			.select("'Total Distinct CHIRP IDs' AS vaccination")
-			.select( o1at[:chirp_id].count(:distinct).as('count') )
-			.to_a
+			.project("'Total Distinct CHIRP IDs' AS vaccination")
+			.project( o1at[:chirp_id].count(:distinct).as('count') )
 
-		observations += Observation
-			.joins( outer( o2at, o1at[:chirp_id].eq(o2at[:chirp_id]) ) )
+		o2 = o1at
+			.outer_join( o2at ).on( o1at[:chirp_id].eq(o2at[:chirp_id]) )
 			.where(o1at[:concept].eq('DEM:DOB'))
 			.where(o1at[:value].matches('2015%'))
 			.where(o2at[:concept].eq('vaccination_desc'))
-			.select("'CHIRP IDs with WebIZ Match' AS vaccination")
-			.select( o1at[:chirp_id].count(:distinct).as('count') )
-			.to_a
+			.project("'CHIRP IDs with WebIZ Match' AS vaccination")
+			.project( o1at[:chirp_id].count(:distinct).as('count') )
 
-		observations += Observation
-			.joins( outer( o2at, o1at[:chirp_id].eq(o2at[:chirp_id]) ) )
+		o3 = o1at
+			.outer_join( o2at ).on( o1at[:chirp_id].eq(o2at[:chirp_id]) )
 			.where(o1at[:concept].eq('DEM:DOB'))
 			.where(o1at[:value].matches('2015%'))
 			.where(o2at[:concept].eq('vaccination_desc'))
-			.select(o2at[:value].as('vaccination'))
-			.select(o2at[:chirp_id].count(:distinct).as('count') )
+			.project(o2at[:value].as('vaccination'))
+			.project(o2at[:chirp_id].count(:distinct).as('count') )
 			.group(o2at[:value])
 
-		observations.sort_by{|o| o.count }.reverse
+		#	Can only union 2 queries, so need to union 2, then union the result to another, etc.
+#
+#		union1 = o1.union(o2)
+#		table1 = Observation.select("first_union.*").from(o1at.create_table_alias(union1,:first_union).to_sql)
+#		union2 = table1.union(o3)
+#		table2 = Observation.from(o1at.create_table_alias(union2,:observations).to_sql)
+
+		Observation.from( o1at.create_table_alias(
+				Observation.select("first_union.*").from(
+					o1at.create_table_alias(
+						o1.union(o2),:first_union).to_sql).union(o3),
+				:observations).to_sql)
+			.order(o1at[:count].desc())
 	end
 
 	def self.individual_vaccination_counts_by_month_year
@@ -201,6 +242,62 @@ class Observation < ApplicationRecord
 			.group( o1at[:value], o2at[:value] )
 			.select( o1at[:value].as('bwt_grp'), o2at[:value] )
 			.select( o1at[:chirp_id].count(:distinct).as('count'))
+	end
+
+	def self.union_test
+#		WORKS
+#		o1at = Observation.arel_table
+#		o1 = o1at.where(o1at[:chirp_id].eq 2068016622).project(Arel.star)
+#		o2 = o1at.where(o1at[:chirp_id].eq 1527949055).project(Arel.star)
+#		union = o1.union(o2)
+#		Observation.from(o1at.create_table_alias(union, :observations).to_sql)
+
+
+		o1at = Observation.arel_table	#	don't think that I can alias the initial table
+		o2at = Observation.arel_table.alias('o2')
+#
+#		#	why union? Just do multiple queries and join the results in ruby
+#
+#		#	using a union will allow for passing the sql to the view, if so desired
+#		#	Sadly, union seems to drop where condition values?
+#
+		o1 = o1at
+			.where(o1at[:concept].eq('DEM:DOB'))
+			.where(o1at[:value].matches('2015%'))
+			.project("'Total Distinct CHIRP IDs' AS vaccination")
+			.project( o1at[:chirp_id].count(:distinct).as('count') )
+
+		o2 = o1at
+			.outer_join( o2at ).on( o1at[:chirp_id].eq(o2at[:chirp_id]) )
+			.where(o1at[:concept].eq('DEM:DOB'))
+			.where(o1at[:value].matches('2015%'))
+			.where(o2at[:concept].eq('vaccination_desc'))
+			.project("'CHIRP IDs with WebIZ Match' AS vaccination")
+			.project( o1at[:chirp_id].count(:distinct).as('count') )
+
+		o3 = o1at
+			.outer_join( o2at ).on( o1at[:chirp_id].eq(o2at[:chirp_id]) )
+			.where(o1at[:concept].eq('DEM:DOB'))
+			.where(o1at[:value].matches('2015%'))
+			.where(o2at[:concept].eq('vaccination_desc'))
+			.project(o2at[:value].as('vaccination'))
+			.project(o2at[:chirp_id].count(:distinct).as('count') )
+			.group(o2at[:value])
+
+
+		#	Can only union 2 queries, so need to union 2, then union the result to another, etc.
+#
+#		union1 = o1.union(o2)
+#		table1 = Observation.select("first_union.*").from(o1at.create_table_alias(union1,:first_union).to_sql)
+#		union2 = table1.union(o3)
+#		table2 = Observation.from(o1at.create_table_alias(union2,:observations).to_sql)
+
+		Observation.from( o1at.create_table_alias(
+				Observation.select("first_union.*").from(
+					o1at.create_table_alias(
+						o1.union(o2),:first_union).to_sql).union(o3),
+				:observations).to_sql)
+			.order(o1at[:count].desc())
 	end
 
 end
