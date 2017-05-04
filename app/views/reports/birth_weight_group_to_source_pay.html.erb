@@ -1,0 +1,72 @@
+<h1>Birth Weight Group to Source Pay</h1>
+
+<% 
+	order = [ "Very Low Birth Weight (<1,500g)", "Low Birth Weight (>=1,500g, <2,500g)", "Normal Birth Weight (>=2,500g, <=8,000g)" ]
+	sorted_results = @results.sort_by{|r| order.index r.bwt_grp }
+%>
+
+<table>
+<thead>
+	<tr>
+		<th>Weight Group</th>
+		<th>Source Pay</th>
+		<th>Count</th>
+	</tr>
+</thead>
+<tbody>
+<% sorted_results.each do |result| %>
+	<tr>
+		<td><%= result.bwt_grp %></td>
+		<td><%= result.source_pay %></td>
+		<td><%= result.count %></td>
+	</tr>
+<% end %>
+</tbody>
+</table>
+
+<div id='chart' class='chart'>
+<!-- /the chart goes here -->
+</div>
+
+<p><%= @results.to_sql %></p>
+
+
+
+
+<script type="text/javascript">
+//<![CDATA[
+
+var groups = [<%=sorted_results.collect{|r| "\"#{r.bwt_grp}\"" }.uniq.join(",").html_safe %>];
+var values = [<%=sorted_results.collect{|r| "\"#{r.source_pay}\"" }.uniq.join(",").html_safe %>];
+
+//	escape otherwise the less than's and greater thans are converted to \u00...
+var js_sorted_results = <%=ActiveSupport.escape_html_entities_in_json = false;sorted_results.to_json.html_safe%>;
+
+var data = [];
+for( i=0; i<=values.length; i++ ){
+	data[i] = {
+		x: groups,
+		y: js_sorted_results.filter( function(result) { 
+					return result.source_pay == values[i]; 
+				}).map( function(result){ 
+					return result.count }),
+		name: values[i],
+		type: 'bar'
+	}
+}
+var layout = {
+	barmode: 'group',
+	title: 'Birth Weight Group to Source Pay',
+	xaxis: {
+		title: 'Birth Weight Group'
+	},
+	yaxis: {
+		title: 'Count'
+	}
+};
+
+Plotly.newPlot('chart', data, layout);
+
+//]]>
+
+</script>

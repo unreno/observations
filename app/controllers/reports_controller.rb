@@ -32,4 +32,8 @@ class ReportsController < ApplicationController
 		@results = Observation.birth_weight_group_to_drug_use
 	end
 
+	def birth_weight_group_to_source_pay
+		@results = Observation.birth_weight_group_to_source_pay
+	end
+
 end
