@@ -13,6 +13,8 @@ Rails.application.routes.draw do
 			get :birth_weight_group_to_prenatal_care
 			get :birth_weight_group_to_source_pay
 			get :birth_weight_group_to_tobacco_use
+			get :birth_weight_group_to_mom_age_group
+			get :birth_weight_group_to_mom_race
 		end
 	end
 

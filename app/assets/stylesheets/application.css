@@ -14,14 +14,16 @@
  *= require_self
  */
 
-
+/*
 table {
 	display:inline-block;
 	vertical-align: top;
 }
+*/
 div#chart {
-	display:inline-block;
-	height:750px;
-	width:800px;
-	vertical-align: top;
+//	display:inline-block;
+	margin-top: -30px;
+	height:900px;
+	width:1500px;
+//	vertical-align: top;
 }

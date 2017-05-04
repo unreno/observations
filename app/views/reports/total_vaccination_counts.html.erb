@@ -1,4 +1,10 @@
+<!--
 <h1>Total Vaccination Counts for all children born in 2015</h1>
+-->
+
+<div id='chart' class='chart'>
+<!-- /the chart goes here -->
+</div>
 
 <table>
 <thead>
@@ -17,10 +23,6 @@
 </tbody>
 </table>
 
-<div id='chart' class='chart'>
-<!-- /the chart goes here -->
-</div>
-
 <p><%= @sql %></p>
 
 <script type="text/javascript">
@@ -34,7 +36,7 @@ var data = [{
 }];
 
 var layout = {
-	title: 'Total Vaccinations for those born in 2015',
+	title: 'Total Vaccinations counts for those born in 2015',
 	xaxis: {
 		title: 'Count'
 	},
