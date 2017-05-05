@@ -27,3 +27,13 @@ div#chart {
 	width:1500px;
 //	vertical-align: top;
 }
+table {
+	border-collapse: collapse;
+  th, td {
+    border: 1px solid silver;
+  }
+  tr th,
+  tr:nth-child(even) {
+    background: #EEE;
+  }
+}
