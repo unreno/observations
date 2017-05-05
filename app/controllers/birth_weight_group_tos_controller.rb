@@ -15,6 +15,7 @@ class BirthWeightGroupTosController < ApplicationController
 			else params[:v]
 		end
 		@results = Observation.birth_weight_group_to params[:v]
+#		@results = Observation.birth_xy 'bwt_grp', params[:v]
 	end
 
 end
