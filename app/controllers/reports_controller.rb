@@ -71,4 +71,10 @@ class ReportsController < ApplicationController
 		render action: 'birth_weight_group_to'
 	end
 
+	def birth_weight_group_to_momrace_ethnchs
+		@value = 'Mom Race ethnchs'
+		@results = Observation.birth_weight_group_to('momrace_ethnchs')
+		render action: 'birth_weight_group_to'
+	end
+
 end
