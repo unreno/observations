@@ -94,42 +94,6 @@ class Observation < ApplicationRecord
 	end
 
 	def self.total_vaccination_counts
-#		o1at = Observation.arel_table	#	don't think that I can alias the initial table
-#		o2at = Observation.arel_table.alias('o2')
-#
-#		#	why union? Just do multiple queries and join the results in ruby
-#
-#		#	using a union will allow for passing the sql to the view, if so desired
-#		#	Sadly, union seems to drop where condition values?
-#
-#		observations = Observation
-#			.where(o1at[:concept].eq('DEM:DOB'))
-#			.where(o1at[:value].matches('2015%'))
-#			.select("'Total Distinct CHIRP IDs' AS vaccination")
-#			.select( o1at[:chirp_id].count(:distinct).as('count') )
-#			.to_a
-#
-#		observations += Observation
-#			.joins( outer( o2at, o1at[:chirp_id].eq(o2at[:chirp_id]) ) )
-#			.where(o1at[:concept].eq('DEM:DOB'))
-#			.where(o1at[:value].matches('2015%'))
-#			.where(o2at[:concept].eq('vaccination_desc'))
-#			.select("'CHIRP IDs with WebIZ Match' AS vaccination")
-#			.select( o1at[:chirp_id].count(:distinct).as('count') )
-#			.to_a
-#
-#		observations += Observation
-#			.joins( outer( o2at, o1at[:chirp_id].eq(o2at[:chirp_id]) ) )
-#			.where(o1at[:concept].eq('DEM:DOB'))
-#			.where(o1at[:value].matches('2015%'))
-#			.where(o2at[:concept].eq('vaccination_desc'))
-#			.select(o2at[:value].as('vaccination'))
-#			.select(o2at[:chirp_id].count(:distinct).as('count') )
-#			.group(o2at[:value])
-#
-#		observations.sort_by{|o| o.count }.reverse
-
-
 		o1at = Observation.arel_table	#	don't think that I can alias the initial table
 		o2at = Observation.arel_table.alias('o2')
 
@@ -182,13 +146,13 @@ class Observation < ApplicationRecord
 		month_vac = Arel::Nodes::NamedFunction.new("MONTH", [o3at[:started_at]], "month")
 
 		results = Observation
-			.joins( outer(o2at, o1at[:chirp_id].eq(o2at[:chirp_id])))
-			.joins( outer(o3at, o1at[:chirp_id].eq(o3at[:chirp_id])))
-			.where(o1at[:concept].eq('DEM:DOB'))
-			.where(o1at[:value].matches('2015%'))
-			.where(o2at[:concept].eq('birth_co'))
-			.where(o2at[:value].eq('Washoe'))
-			.where(o3at[:concept].eq('vaccination_desc'))
+			.joins( outer(o2at, o1at[:chirp_id].eq(o2at[:chirp_id])) )
+			.joins( outer(o3at, o1at[:chirp_id].eq(o3at[:chirp_id])) )
+			.where( o1at[:concept].eq('DEM:DOB') )
+			.where( o1at[:value].matches('2015%') )
+			.where( o2at[:concept].eq('birth_co') )
+			.where( o2at[:value].eq('Washoe') )
+			.where( o3at[:concept].eq('vaccination_desc') )
 			.group( group_year_vac, group_month_vac )
 			.order( group_year_vac, group_month_vac )
 			.select( year_vac, month_vac )
@@ -211,8 +175,8 @@ class Observation < ApplicationRecord
 		mom_age = Arel::Nodes::NamedFunction.new("CAST", [o2at[:value].as("INT")], "mom_age")
 
 		Observation
-			.joins( outer(o2at, o1at[:chirp_id].eq(o2at[:chirp_id]) ))
-			.joins( outer(o3at, o1at[:chirp_id].eq(o3at[:chirp_id]) ))
+			.joins( outer(o2at, o1at[:chirp_id].eq(o2at[:chirp_id])) )
+			.joins( outer(o3at, o1at[:chirp_id].eq(o3at[:chirp_id])) )
 			.where( o1at[:concept].eq 'DEM:Weight' )
 			.where( o1at[:units].eq 'grams' )
 			.where( o1at[:source_table].eq 'births' )
@@ -229,8 +193,8 @@ class Observation < ApplicationRecord
 		o3at = Observation.arel_table.alias('o3')
 
 		Observation
-			.joins( outer(o2at, o1at[:chirp_id].eq(o2at[:chirp_id]) ))
-			.joins( outer(o3at, o1at[:chirp_id].eq(o3at[:chirp_id]) ))
+			.joins( outer(o2at, o1at[:chirp_id].eq(o2at[:chirp_id])) )
+			.joins( outer(o3at, o1at[:chirp_id].eq(o3at[:chirp_id])) )
 			.where( o1at[:concept].eq 'bwt_grp' )
 			.where( o1at[:source_table].eq 'births' )
 			.where( o2at[:concept].eq field )
@@ -239,7 +203,7 @@ class Observation < ApplicationRecord
 			.where( o3at[:value].eq('Washoe') )
 			.group( o1at[:value], o2at[:value] )
 			.select( o1at[:value].as('bwt_grp'), o2at[:value] )
-			.select( o1at[:chirp_id].count(:distinct).as('count'))
+			.select( o1at[:chirp_id].count(:distinct).as('count') )
 	end
 
 	def self.birth_xy( x, y )
@@ -248,8 +212,8 @@ class Observation < ApplicationRecord
 		o3at = Observation.arel_table.alias('o3')
 
 		Observation
-			.joins( outer(o2at, o1at[:chirp_id].eq(o2at[:chirp_id]) ))
-			.joins( outer(o3at, o1at[:chirp_id].eq(o3at[:chirp_id]) ))
+			.joins( outer(o2at, o1at[:chirp_id].eq(o2at[:chirp_id])) )
+			.joins( outer(o3at, o1at[:chirp_id].eq(o3at[:chirp_id])) )
 			.where( o1at[:concept].eq x )
 			.where( o1at[:source_table].eq 'births' )
 			.where( o2at[:concept].eq y )
@@ -258,7 +222,7 @@ class Observation < ApplicationRecord
 			.where( o3at[:value].eq('Washoe') )
 			.group( o1at[:value], o2at[:value] )
 			.select( o1at[:value].as('x'), o2at[:value].as('y') )
-			.select( o1at[:chirp_id].count(:distinct).as('count'))
+			.select( o1at[:chirp_id].count(:distinct).as('count') )
 	end
 
 end
