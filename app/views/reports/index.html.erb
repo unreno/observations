@@ -2,16 +2,16 @@
 <h1>Reports</h1>
 
 <ul>
-	<li><%= link_to "Birth Weight Group to Mom Alcohol Use", birth_weight_group_to_alcohol_use_reports_path %></li>
-	<li><%= link_to "Birth Weight Group to Mom Drug Use", birth_weight_group_to_drug_use_reports_path %></li>
-	<li><%= link_to "Birth Weight Group to Mom OTC Drug Use", birth_weight_group_to_otc_drug_use_reports_path %></li>
-	<li><%= link_to "Birth Weight Group to Mom Prescription Drug Use", birth_weight_group_to_prescription_drug_use_reports_path %></li>
-	<li><%= link_to "Birth Weight Group to Mom Age Group", birth_weight_group_to_mom_age_group_reports_path %></li>
-	<li><%= link_to "Birth Weight Group to Mom Race", birth_weight_group_to_mom_race_reports_path %></li>
-	<li><%= link_to "Birth Weight Group to Mom Race ethnchs", birth_weight_group_to_momrace_ethnchs_reports_path %></li>
-	<li><%= link_to "Birth Weight Group to Source Pay", birth_weight_group_to_source_pay_reports_path %></li>
-	<li><%= link_to "Birth Weight Group to Mom Tobacco Use", birth_weight_group_to_tobacco_use_reports_path %></li>
-	<li><%= link_to "Birth Weight Group to Prenatal Care", birth_weight_group_to_prenatal_care_reports_path %></li>
+	<li><%= link_to "Birth Weight Group to Mom Alcohol Use", birth_weight_group_to_path(v: :alcohol) %></li>
+	<li><%= link_to "Birth Weight Group to Mom Drug Use", birth_weight_group_to_path(v: :drug_use) %></li>
+	<li><%= link_to "Birth Weight Group to Mom OTC Drug Use", birth_weight_group_to_path(v: :du_otc) %></li>
+	<li><%= link_to "Birth Weight Group to Mom Prescription Drug Use", birth_weight_group_to_path(v: :du_prscr) %></li>
+	<li><%= link_to "Birth Weight Group to Mom Age Group", birth_weight_group_to_path(v: :mom_age1) %></li>
+	<li><%= link_to "Birth Weight Group to Mom Race", birth_weight_group_to_path(v: :mom_race1) %></li>
+	<li><%= link_to "Birth Weight Group to Mom Race ethnchs", birth_weight_group_to_path(v: :momrace_ethnchs) %></li>
+	<li><%= link_to "Birth Weight Group to Source Pay", birth_weight_group_to_path(v: :source_pay) %></li>
+	<li><%= link_to "Birth Weight Group to Mom Tobacco Use", birth_weight_group_to_path(v: :tobacco) %></li>
+	<li><%= link_to "Birth Weight Group to Prenatal Care", birth_weight_group_to_path(v: :prenatal) %></li>
 	<li><%= link_to "Birth Weight to Mom Age", birth_weight_to_mom_age_reports_path %></li>
 	<li><%= link_to "Completed Immunization Counts for DOB 2015", completed_immunizations_reports_path %></li>
 	<li><%= link_to "Total Vaccination Counts for DOB 2015", total_vaccination_counts_reports_path %></li>
