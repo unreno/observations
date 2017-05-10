@@ -187,6 +187,58 @@ class Observation < ApplicationRecord
 			.select( weight, mom_age )
 	end
 
+	def self.birth_weight_to_tot_cigs
+		o1at = Observation.arel_table	#	don't think that I can alias the initial table
+		o2at = Observation.arel_table.alias('o2')
+		o3at = Observation.arel_table.alias('o3')
+		o4at = Observation.arel_table.alias('o4')
+		o5at = Observation.arel_table.alias('o5')
+		o6at = Observation.arel_table.alias('o6')
+
+		weight = Arel::Nodes::NamedFunction.new("CAST", [o2at[:value].as("INT")], "weight")
+		prepreg_cig = Arel::Nodes::NamedFunction.new("CAST", [o3at[:value].as("INT")], "prepreg_cig")
+		first_cig = Arel::Nodes::NamedFunction.new("CAST", [o4at[:value].as("INT")], "first_cig")
+		sec_cig = Arel::Nodes::NamedFunction.new("CAST", [o5at[:value].as("INT")], "sec_cig")
+		last_cig = Arel::Nodes::NamedFunction.new("CAST", [o6at[:value].as("INT")], "last_cig")
+
+#	Not quite there yet.
+#		tot_cigs = Arel::Nodes::Addition.new(
+#			Arel::Nodes::Addition.new(
+#				Arel::Nodes::Addition.new(
+#					Arel::Nodes::Multiplication.new(90,prepreg_cig),
+#					Arel::Nodes::Multiplication.new(90,first_cig) ),
+#					Arel::Nodes::Multiplication.new(90,sec_cig) ),
+#					Arel::Nodes::Multiplication.new(90,last_cig) ).as('tot_cigs2')
+
+		Observation
+			.joins( outer(o2at, o1at[:chirp_id].eq(o2at[:chirp_id])) )
+			.joins( outer(o3at, o1at[:chirp_id].eq(o3at[:chirp_id])) )
+			.joins( outer(o4at, o1at[:chirp_id].eq(o4at[:chirp_id])) )
+			.joins( outer(o5at, o1at[:chirp_id].eq(o5at[:chirp_id])) )
+			.joins( outer(o6at, o1at[:chirp_id].eq(o6at[:chirp_id])) )
+			.where( o1at[:concept].eq('birth_co') )
+			.where( o1at[:value].eq('Washoe') )
+			.where( o2at[:concept].eq 'DEM:Weight' )
+			.where( o2at[:units].eq 'grams' )
+			.where( o2at[:source_table].eq 'births' )
+			.where( o3at[:concept].eq('prepreg_cig') )
+			.where( o3at[:value].not_eq('99') )
+			.where( o4at[:concept].eq('first_cig') )
+			.where( o4at[:value].not_eq('99') )
+			.where( o5at[:concept].eq('sec_cig') )
+			.where( o5at[:value].not_eq('99') )
+			.where( o6at[:concept].eq('last_cig') )
+			.where( o6at[:value].not_eq('99') )
+			.select( o1at[:chirp_id], weight, prepreg_cig, first_cig, sec_cig, last_cig,
+				"( 90*CAST( o3.value AS INT ) + 90*CAST( o4.value AS INT ) + 90*CAST( o5.value AS INT ) + 90*CAST( o6.value AS INT ) ) AS tot_cigs" )	#, tot_cigs)
+
+#	sadly no elegant arel way to add these columns found just yet
+#	Could use Arel::Nodes::Addition.new(a,b) [only takes 2 so would have to do multiple times]
+
+#			.select( o1at[:chirp_id], weight, prepreg_cig + first_cig )#, tot_cig )
+
+	end
+
 	def self.birth_weight_group_to( field, as = nil )
 		o1at = Observation.arel_table	#	don't think that I can alias the initial table
 		o2at = Observation.arel_table.alias('o2')

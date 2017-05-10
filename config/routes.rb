@@ -6,6 +6,7 @@ Rails.application.routes.draw do
 			get :individual_vaccination_counts_by_month_year
 			get :total_vaccination_counts
 			get :birth_weight_to_mom_age
+			get :birth_weight_to_tot_cigs
 #			get :birth_weight_group_to_alcohol_use
 #			get :birth_weight_group_to_drug_use
 #			get :birth_weight_group_to_otc_drug_use

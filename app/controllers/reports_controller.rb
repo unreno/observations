@@ -17,4 +17,8 @@ class ReportsController < ApplicationController
 		@results = Observation.birth_weight_to_mom_age
 	end
 
+	def birth_weight_to_tot_cigs
+		@results = Observation.birth_weight_to_tot_cigs
+	end
+
 end
