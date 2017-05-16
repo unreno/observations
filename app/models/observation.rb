@@ -256,9 +256,7 @@ class Observation < ApplicationRecord
 		#	same name as in .as(...) above (to be used when selecting or whereing)
 		grouping = Arel::Table.new( grouping_table_name )
 
-
-#			.select( grouping[:name].as 'group_name' )
-		#	select before join
+		#	select before join, project after join (same thing)
 		outside_select = Observation.from(grouping_sql.to_sql)
 			.select( o1at[:value] )
 			.select( o1at[:value].count.as 'count' )
@@ -272,7 +270,7 @@ class Observation < ApplicationRecord
 			.outer_join( o3at ).on( o1at[:chirp_id].eq( o3at[:chirp_id]))
 			.where( o3at[:concept].eq('birth_co') )
 			.where( o3at[:value].eq('Washoe') )
-			.group( o1at[:value], o2at[:value] )
+			.group( o1at[:value], o2at[:value], grouping[:total] )
 			.order( o1at[:value] )
 
 #	SELECT `observations`.`value`, 
