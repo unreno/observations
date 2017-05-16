@@ -28,7 +28,7 @@
 		<td><%= result['bwt_grp'] %></td>
 		<td><%= result['value'] %></td>
 		<td><%= result['count'] %></td>
-		<td><%= result['group_total'] %></td>
+		<td><%= result['total'] %></td>
 	</tr>
 <% end %>
 </tbody>
@@ -55,7 +55,7 @@ for( i=0; i<=values.length; i++ ){
 		y: js_sorted_results.filter( function(result) { 
 					return result.value == values[i]; 
 				}).map( function(result){ 
-					return 100.*result.count/result.group_total }),
+					return 100.*result.count/result.total }),
 		name: values[i],
 		type: 'bar'
 	}
@@ -63,12 +63,12 @@ for( i=0; i<=values.length; i++ ){
 var layout = {
 	hovermode: 'closest',
 	barmode: 'group',
-	title: 'Birth Weight Group to <%=@value%>',
+	title: 'Birth Weight Group to Percent of <%=@value%>',
 	xaxis: {
 		title: 'Birth Weight Group'
 	},
 	yaxis: {
-		title: 'Percent in Group'
+		title: 'Percent of <%=@value%>'
 	}
 };
 

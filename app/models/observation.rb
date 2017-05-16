@@ -258,10 +258,10 @@ class Observation < ApplicationRecord
 
 		#	select before join, project after join (same thing)
 		outside_select = Observation.from(grouping_sql.to_sql)
-			.select( o1at[:value] )
+			.select( o1at[:value].as 'value' )
 			.select( o1at[:value].count.as 'count' )
 			.select( o2at[:value].as 'bwt_grp' )
-			.select( grouping[:total].as 'group_total' )
+			.select( grouping[:total].as 'total' )
 			.outer_join( o1at ).on( o1at[:value].eq( grouping[:name]))
 			.where( o1at[:concept].eq field )
 			.where( o1at[:source_table].eq 'births' )
