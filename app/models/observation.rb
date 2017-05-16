@@ -11,7 +11,7 @@ class Observation < ApplicationRecord
 		o3=o1.alias('o3')
 		o4=o1.alias('o4')
 
-#	NEED TO ADD THE DOB/VAC date comparison
+#	NEED TO ADD THE DOB/VAC date comparison. Looks done
 
 		inside_select = o1.outer_join(o2).on(o1[:chirp_id].eq(o2[:chirp_id]))
 			.outer_join(o3).on(o1[:chirp_id].eq(o3[:chirp_id]))
@@ -48,7 +48,6 @@ class Observation < ApplicationRecord
 
 		inside = Arel::Table.new('inside')
 		#	SUM(CASE ... is not agnostic but seems to work on both MySQL/MariaDB and SQL Server!
-#		outside_select = Observation.from(Arel.sql("(#{inside_select.to_sql})"))	# AS inside"))
 		outside_select = Observation.from(inside_select.as('inside').to_sql)
 			.group(inside[:chirp_id], inside[:dob])
 			.select(inside[:chirp_id], inside[:dob])
@@ -61,10 +60,8 @@ class Observation < ApplicationRecord
 			.project("SUM(CASE WHEN vaccination = 'Rotavirus (2 dose)' THEN 1 ELSE 0 END) AS r2_count")
 			.project("SUM(CASE WHEN vaccination = 'Rotavirus (3 dose)' THEN 1 ELSE 0 END) AS r3_count")
 			.as('outside')
-#			.where(inside[:started_at].lt(inside[:dob7]))
 
-		outside = Arel::Table.new('outside')
-#		xyz = Observation.from(Arel.sql("(#{outside_select.to_sql})"))	# AS outside"))
+		outside = Arel::Table.new('outside')	#	same name as in .as(...) above
 		xyz = Observation.from(outside_select.to_sql)
 			.select(Arel.star)
 			.where(outside[:dtap_count].gteq(3))
@@ -237,6 +234,61 @@ class Observation < ApplicationRecord
 
 #			.select( o1at[:chirp_id], weight, prepreg_cig + first_cig )#, tot_cig )
 
+	end
+
+	def self.birth_weight_group_percents_to( field, as = nil )
+		o1at = Observation.arel_table	#	don't think that I can alias the initial table
+
+		grouping_table_name = 'grouping'
+
+		grouping_sql = o1at
+			.project( o1at[:value].as 'name' )
+			.project( o1at[:value].count.as 'total' )
+			.where( o1at[:concept].eq field )
+			.group( o1at[:value] )
+			.as( grouping_table_name )
+
+#	something like ... but with zip code rather than birth month
+#select month(o.started_at) as mo, o.value as va, count(1), tmp.mcount, 100. * count(1) / tmp.mcount
+#from observations o
+#join (
+  #select month(osub.started_at) as mmo, count(1) as mcount
+  #from observations osub
+  #where concept = 'bwt_grp'
+  #group by month(osub.started_at)
+#) tmp on tmp.mmo = month(o.started_at)
+#where concept = 'bwt_grp'
+#group by o.value, month(o.started_at);
+#
+
+		#	same name as in .as(...) above (to be used when selecting or whereing)
+		grouping = Arel::Table.new( grouping_table_name )
+
+		o2at = o1at.alias('o2')
+
+		#	select before join
+		outside_select = Observation.from(grouping_sql.to_sql)
+			.select( o1at[:concept] )
+			.select( o1at[:value].count.as 'count' )
+			.select( grouping[:name].as 'group_name' )
+			.select( grouping[:total].as 'group_total' )
+			.outer_join( o1at ).on( o1at[:value].eq( grouping[:name]))
+			.where( o1at[:concept].eq field )
+			.outer_join( o2at ).on( o1at[:chirp_id].eq( o2at[:chirp_id]))
+			.where( o2at[:concept].eq 'bwt_grp' )
+			.group( o1at[:value], o2at[:value] )
+
+#			.as('outside')
+
+#		xyz = Observation.from(outside_select.to_sql)
+#			.outer_join( grouping ).on( outside[:value].eq( grouping[:name]))
+#			.project( grouping[:name].as 'group_name' )
+#			.project( grouping[:total].as 'group_total' )
+#			.where( outside[:concept].eq 'bwt_grp' )
+#			.group( outside[:concept], outside[:value] )
+
+# SELECT `observations`.*, `grouping`.`name` AS group_name, `grouping`.`total` AS group_total FROM (SELECT `grouping`.`name`, `grouping`.`total` FROM (SELECT `observations`.`value` AS name, COUNT(`observations`.`value`) AS total FROM `observations` WHERE `observations`.`concept` = 'bwt_grp' GROUP BY `observations`.`value`) grouping) outside LEFT OUTER JOIN `grouping` ON `outside`.`value` = `grouping`.`name` WHERE `outside`.`concept` = 'bwt_grp' GROUP BY `outside`.`concept`, `outside`.`value`
+		
 	end
 
 	def self.birth_weight_group_to( field, as = nil )
