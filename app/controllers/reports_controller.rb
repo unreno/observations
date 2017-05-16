@@ -1,5 +1,11 @@
 class ReportsController < ApplicationController
 
+	def birth_weight_group_percents_to
+		@value = params[:v] || 'DEM:Zip'
+		@query = Observation.birth_weight_group_percents_to( @value )
+		@results = ActiveRecord::Base.connection.select_all( @query )
+	end
+
 	def completed_immunizations
 		@query = Observation.completed_immunizations
 		@results = ActiveRecord::Base.connection.select_all( @query )

@@ -238,57 +238,58 @@ class Observation < ApplicationRecord
 
 	def self.birth_weight_group_percents_to( field, as = nil )
 		o1at = Observation.arel_table	#	don't think that I can alias the initial table
+		o2at = o1at.alias('o2')
+		o3at = o1at.alias('o3')
 
 		grouping_table_name = 'grouping'
 
 		grouping_sql = o1at
 			.project( o1at[:value].as 'name' )
 			.project( o1at[:value].count.as 'total' )
+			.outer_join( o3at ).on( o1at[:chirp_id].eq( o3at[:chirp_id]))
+			.where( o3at[:concept].eq('birth_co') )
+			.where( o3at[:value].eq('Washoe') )
 			.where( o1at[:concept].eq field )
 			.group( o1at[:value] )
 			.as( grouping_table_name )
 
-#	something like ... but with zip code rather than birth month
-#select month(o.started_at) as mo, o.value as va, count(1), tmp.mcount, 100. * count(1) / tmp.mcount
-#from observations o
-#join (
-  #select month(osub.started_at) as mmo, count(1) as mcount
-  #from observations osub
-  #where concept = 'bwt_grp'
-  #group by month(osub.started_at)
-#) tmp on tmp.mmo = month(o.started_at)
-#where concept = 'bwt_grp'
-#group by o.value, month(o.started_at);
-#
-
 		#	same name as in .as(...) above (to be used when selecting or whereing)
 		grouping = Arel::Table.new( grouping_table_name )
 
-		o2at = o1at.alias('o2')
 
+#			.select( grouping[:name].as 'group_name' )
 		#	select before join
 		outside_select = Observation.from(grouping_sql.to_sql)
-			.select( o1at[:concept] )
+			.select( o1at[:value] )
 			.select( o1at[:value].count.as 'count' )
-			.select( grouping[:name].as 'group_name' )
+			.select( o2at[:value].as 'bwt_grp' )
 			.select( grouping[:total].as 'group_total' )
 			.outer_join( o1at ).on( o1at[:value].eq( grouping[:name]))
 			.where( o1at[:concept].eq field )
+			.where( o1at[:source_table].eq 'births' )
 			.outer_join( o2at ).on( o1at[:chirp_id].eq( o2at[:chirp_id]))
 			.where( o2at[:concept].eq 'bwt_grp' )
+			.outer_join( o3at ).on( o1at[:chirp_id].eq( o3at[:chirp_id]))
+			.where( o3at[:concept].eq('birth_co') )
+			.where( o3at[:value].eq('Washoe') )
 			.group( o1at[:value], o2at[:value] )
+			.order( o1at[:value] )
 
-#			.as('outside')
+#	SELECT `observations`.`value`, 
+#		COUNT(`observations`.`value`) AS count, 
+#		`o2`.`value` AS bwt_grp, 
+#		`grouping`.`total` AS group_total 
+#	FROM (
+#		SELECT `observations`.`value` AS name, COUNT(`observations`.`value`) AS total 
+#		FROM `observations` 
+#		WHERE `observations`.`concept` = 'DEM:Zip' 
+#		GROUP BY `observations`.`value`
+#	) grouping 
+#	LEFT OUTER JOIN `observations` ON `observations`.`value` = `grouping`.`name` 
+#	LEFT OUTER JOIN `observations` `o2` ON `observations`.`chirp_id` = `o2`.`chirp_id` 
+#	WHERE `observations`.`concept` = 'DEM:Zip' AND `o2`.`concept` = 'bwt_grp' 
+#	GROUP BY `observations`.`value`, `o2`.`value`
 
-#		xyz = Observation.from(outside_select.to_sql)
-#			.outer_join( grouping ).on( outside[:value].eq( grouping[:name]))
-#			.project( grouping[:name].as 'group_name' )
-#			.project( grouping[:total].as 'group_total' )
-#			.where( outside[:concept].eq 'bwt_grp' )
-#			.group( outside[:concept], outside[:value] )
-
-# SELECT `observations`.*, `grouping`.`name` AS group_name, `grouping`.`total` AS group_total FROM (SELECT `grouping`.`name`, `grouping`.`total` FROM (SELECT `observations`.`value` AS name, COUNT(`observations`.`value`) AS total FROM `observations` WHERE `observations`.`concept` = 'bwt_grp' GROUP BY `observations`.`value`) grouping) outside LEFT OUTER JOIN `grouping` ON `outside`.`value` = `grouping`.`name` WHERE `outside`.`concept` = 'bwt_grp' GROUP BY `outside`.`concept`, `outside`.`value`
-		
 	end
 
 	def self.birth_weight_group_to( field, as = nil )

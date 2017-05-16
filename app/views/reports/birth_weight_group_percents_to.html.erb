@@ -4,8 +4,9 @@
 
 <% 
 	order = [ "Very Low Birth Weight (<1,500g)", "Low Birth Weight (>=1,500g, <2,500g)", "Normal Birth Weight (>=2,500g, <=8,000g)" ]
-	sorted_results = @results.sort_by{|r| order.index r.bwt_grp }
+	sorted_results = @results.sort_by{|r| order.index r['bwt_grp'] }
 %>
+
 
 
 <div id='chart' class='chart'>
@@ -18,20 +19,22 @@
 		<th>Weight Group</th>
 		<th><%=@value%></th>
 		<th>Count</th>
+		<th>Group Total</th>
 	</tr>
 </thead>
 <tbody>
 <% sorted_results.each do |result| %>
 	<tr>
-		<td><%= result.bwt_grp %></td>
-		<td><%= result.value %></td>
-		<td><%= result.count %></td>
+		<td><%= result['bwt_grp'] %></td>
+		<td><%= result['value'] %></td>
+		<td><%= result['count'] %></td>
+		<td><%= result['group_total'] %></td>
 	</tr>
 <% end %>
 </tbody>
 </table>
 
-<p><%= @results.to_sql %></p>
+<p><%= @query.to_sql %></p>
 
 
 
@@ -39,8 +42,8 @@
 <script type="text/javascript">
 //<![CDATA[
 
-var groups = [<%=sorted_results.collect{|r| "\"#{r.bwt_grp}\"" }.uniq.join(",").html_safe %>];
-var values = [<%=sorted_results.collect{|r| "\"#{r.value}\"" }.uniq.sort.join(",").html_safe %>];
+var groups = [<%=sorted_results.collect{|r| "\"#{r['bwt_grp']}\"" }.uniq.join(",").html_safe %>];
+var values = [<%=sorted_results.collect{|r| "\"#{r['value']}\"" }.uniq.sort.join(",").html_safe %>];
 
 //	escape otherwise the less than's and greater thans are converted to \u00...
 var js_sorted_results = <%=ActiveSupport.escape_html_entities_in_json = false;sorted_results.to_json.html_safe%>;
@@ -52,7 +55,7 @@ for( i=0; i<=values.length; i++ ){
 		y: js_sorted_results.filter( function(result) { 
 					return result.value == values[i]; 
 				}).map( function(result){ 
-					return result.count }),
+					return 100.*result.count/result.group_total }),
 		name: values[i],
 		type: 'bar'
 	}
@@ -65,7 +68,7 @@ var layout = {
 		title: 'Birth Weight Group'
 	},
 	yaxis: {
-		title: 'Count'
+		title: 'Percent in Group'
 	}
 };
 
