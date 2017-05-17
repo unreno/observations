@@ -49,7 +49,24 @@ var values = [<%=sorted_results.collect{|r| "\"#{r['value']}\"" }.uniq.sort.join
 var js_sorted_results = <%=ActiveSupport.escape_html_entities_in_json = false;sorted_results.to_json.html_safe%>;
 
 var data = [];
-for( i=0; i<=values.length; i++ ){
+//for( i=0; i<=values.length; i++ ){
+for( i=0; i<values.length; i++ ){
+
+	group_values = js_sorted_results.filter( function(x) { return x.value == values[i]; });
+
+	data_ys = groups.map( function(bwtgroup){ 
+		z = group_values.filter( function(y){ return bwtgroup == y.bwt_grp } )[0]; 
+		return ( typeof(z) == 'undefined' ) ? 0 : 100.*z.count/z.total ;
+	} );
+		
+	data[i] = {
+		x: groups,
+		y: data_ys,
+		name: values[i],
+		type: 'bar'
+	}
+
+/*
 	data[i] = {
 		x: groups,
 		y: js_sorted_results.filter( function(result) { 
@@ -59,6 +76,7 @@ for( i=0; i<=values.length; i++ ){
 		name: values[i],
 		type: 'bar'
 	}
+*/
 }
 var layout = {
 	hovermode: 'closest',

@@ -250,6 +250,7 @@ class Observation < ApplicationRecord
 			.where( o3at[:concept].eq('birth_co') )
 			.where( o3at[:value].eq('Washoe') )
 			.where( o1at[:concept].eq field )
+			.where( o1at[:source_table].eq 'births' )
 			.group( o1at[:value] )
 			.as( grouping_table_name )
 
@@ -326,6 +327,47 @@ class Observation < ApplicationRecord
 			.group( o1at[:value], o2at[:value] )
 			.select( o1at[:value].as('x'), o2at[:value].as('y') )
 			.select( o1at[:chirp_id].count(:distinct).as('count') )
+	end
+
+	def self.ave_birth_weight_to_zip
+		o1at = Observation.arel_table	#	don't think that I can alias the initial table
+		o2at = Observation.arel_table.alias('o2')
+		o3at = Observation.arel_table.alias('o3')
+
+		Observation
+			.joins( outer(o2at, o1at[:chirp_id].eq(o2at[:chirp_id])) )
+			.joins( outer(o3at, o1at[:chirp_id].eq(o3at[:chirp_id])) )
+			.where( o1at[:concept].eq 'DEM:Weight' )
+			.where( o1at[:units].eq 'grams' )
+			.where( o1at[:source_table].eq 'births' )
+			.where( o2at[:concept].eq 'DEM:Zip' )
+			.where( o2at[:source_table].eq 'births' )
+			.where( o3at[:concept].eq('birth_co') )
+			.where( o3at[:value].eq('Washoe') )
+			.group( o2at[:value] )
+			.select( o1at[:value].average.as('weight'), o2at[:value].as('zip') )
+	end
+
+	def self.birth_weight_birth_weight_group_check
+		o1at = Observation.arel_table	#	don't think that I can alias the initial table
+		o2at = Observation.arel_table.alias('o2')
+		o3at = Observation.arel_table.alias('o3')
+		o4at = Observation.arel_table.alias('o4')
+
+		Observation
+			.joins( outer(o2at, o1at[:chirp_id].eq(o2at[:chirp_id])) )
+			.joins( outer(o3at, o1at[:chirp_id].eq(o3at[:chirp_id])) )
+			.joins( outer(o4at, o1at[:chirp_id].eq(o4at[:chirp_id])) )
+			.where( o1at[:concept].eq 'DEM:Weight' )
+			.where( o1at[:units].eq 'grams' )
+			.where( o1at[:source_table].eq 'births' )
+			.where( o2at[:concept].eq 'bwt_grp' )
+			.where( o2at[:source_table].eq 'births' )
+			.where( o3at[:concept].eq('birth_co') )
+			.where( o3at[:value].eq('Washoe') )
+			.where( o4at[:concept].eq('DEM:Zip') )
+			.where( o4at[:source_table].eq 'births' )
+			.select( o1at[:value].as('weight'), o2at[:value].as('wgroup'), o4at[:value].as('zip') )
 	end
 
 end

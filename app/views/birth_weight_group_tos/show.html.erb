@@ -46,16 +46,30 @@ var values = [<%=sorted_results.collect{|r| "\"#{r.value}\"" }.uniq.sort.join(",
 var js_sorted_results = <%=ActiveSupport.escape_html_entities_in_json = false;sorted_results.to_json.html_safe%>;
 
 var data = [];
-for( i=0; i<=values.length; i++ ){
+for( i=0; i<values.length; i++ ){
+
+//	group_values = js_sorted_results.filter( function(result) { return result.value == '89412'; });
+	group_values = js_sorted_results.filter( function(x) { return x.value == values[i]; });
+
+	data_ys = groups.map( function(bwtgroup){ 
+		z = group_values.filter( function(y){ return bwtgroup == y.bwt_grp } )[0]; 
+		return ( typeof(z) == 'undefined' ) ? 0 : z.count ;
+	} );
+		
 	data[i] = {
 		x: groups,
+		y: data_ys,
+		name: values[i],
+		type: 'bar'
+	}
+
+/*
+Only works if all the groups are there
 		y: js_sorted_results.filter( function(result) { 
 					return result.value == values[i]; 
 				}).map( function(result){ 
 					return result.count }),
-		name: values[i],
-		type: 'bar'
-	}
+*/
 }
 var layout = {
 	hovermode: 'closest',

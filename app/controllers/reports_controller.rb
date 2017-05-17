@@ -1,5 +1,9 @@
 class ReportsController < ApplicationController
 
+	def ave_birth_weight_to_zip
+		@results = Observation.ave_birth_weight_to_zip
+	end
+
 	def birth_weight_group_to_percent_of
 		@value = params[:v] || 'DEM:Zip'
 		@query = Observation.birth_weight_group_percents_to( @value )
