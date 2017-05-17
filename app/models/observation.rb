@@ -334,6 +334,9 @@ class Observation < ApplicationRecord
 		o2at = Observation.arel_table.alias('o2')
 		o3at = Observation.arel_table.alias('o3')
 
+		weight = Arel::Nodes::NamedFunction.new("CAST", [o1at[:value].as("INT")])
+		ave_weight = Arel::Nodes::NamedFunction.new("AVG", [weight])
+
 		Observation
 			.joins( outer(o2at, o1at[:chirp_id].eq(o2at[:chirp_id])) )
 			.joins( outer(o3at, o1at[:chirp_id].eq(o3at[:chirp_id])) )
@@ -345,7 +348,7 @@ class Observation < ApplicationRecord
 			.where( o3at[:concept].eq('birth_co') )
 			.where( o3at[:value].eq('Washoe') )
 			.group( o2at[:value] )
-			.select( o1at[:value].average.as('weight'), o2at[:value].as('zip') )
+			.select( ave_weight.as('weight'), o2at[:value].as('zip') )
 	end
 
 	def self.birth_weight_birth_weight_group_check
