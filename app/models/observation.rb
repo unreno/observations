@@ -334,8 +334,8 @@ class Observation < ApplicationRecord
 		o2at = Observation.arel_table.alias('o2')
 		o3at = Observation.arel_table.alias('o3')
 
-		weight = Arel::Nodes::NamedFunction.new("CAST", [o1at[:value].as("INT")])
-		ave_weight = Arel::Nodes::NamedFunction.new("AVG", [weight])
+		weight = Arel::Nodes::NamedFunction.new("CAST", [o1at[:value].as("INT")])	#, 'weight')
+		ave_weight = Arel::Nodes::NamedFunction.new("AVG", [weight])	#, 'avg_weight')
 
 		Observation
 			.joins( outer(o2at, o1at[:chirp_id].eq(o2at[:chirp_id])) )
