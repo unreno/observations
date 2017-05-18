@@ -3,8 +3,8 @@
 -->
 
 <% 
-	order = [ "Very Low Birth Weight (<1,500g)", "Low Birth Weight (>=1,500g, <2,500g)", "Normal Birth Weight (>=2,500g, <=8,000g)" ]
-	sorted_results = @results.sort_by{|r| order.index r['bwt_grp'] }
+	group_order = [ "Very Low Birth Weight (<1,500g)", "Low Birth Weight (>=1,500g, <2,500g)", "Normal Birth Weight (>=2,500g, <=8,000g)" ]
+	sorted_results = @results.sort_by{|r| group_order.index r['bwt_grp'] }
 %>
 
 
@@ -42,42 +42,21 @@
 <script type="text/javascript">
 //<![CDATA[
 
-var groups = [<%=sorted_results.collect{|r| "\"#{r['bwt_grp']}\"" }.uniq.join(",").html_safe %>];
-var values = [<%=sorted_results.collect{|r| "\"#{r['value']}\"" }.uniq.sort.join(",").html_safe %>];
-
-//	escape otherwise the less than's and greater thans are converted to \u00...
-var js_sorted_results = <%=ActiveSupport.escape_html_entities_in_json = false;sorted_results.to_json.html_safe%>;
-
+var groups = [<%=group_order.collect{|group| "\"#{group}\"" }.join(", ").html_safe %>];
 var data = [];
-//for( i=0; i<=values.length; i++ ){
-for( i=0; i<values.length; i++ ){
 
-	group_values = js_sorted_results.filter( function(x) { return x.value == values[i]; });
+<% sorted_results.collect{|r| r['value'] }.uniq.sort.each_with_index do |value,i| %>
+data[<%=i%>] = {
+	x: groups,
+	y: [<%= group_order.collect{|group| 
+			r = sorted_results.find{|r| r['bwt_grp'] == group and r['value'] == value }
+			( r.present? ) ? ( ( 100. * r['count'] ) / r['total'] ) : 0
+			}.join(", ").html_safe %>],
+	name: '<%=value.html_safe%>',
+	type: 'bar'
+};
+<% end.join("\n")	#	sorted_results %>
 
-	data_ys = groups.map( function(bwtgroup){ 
-		z = group_values.filter( function(y){ return bwtgroup == y.bwt_grp } )[0]; 
-		return ( typeof(z) == 'undefined' ) ? 0 : 100.*z.count/z.total ;
-	} );
-		
-	data[i] = {
-		x: groups,
-		y: data_ys,
-		name: values[i],
-		type: 'bar'
-	}
-
-/*
-	data[i] = {
-		x: groups,
-		y: js_sorted_results.filter( function(result) { 
-					return result.value == values[i]; 
-				}).map( function(result){ 
-					return 100.*result.count/result.total }),
-		name: values[i],
-		type: 'bar'
-	}
-*/
-}
 var layout = {
 	hovermode: 'closest',
 	barmode: 'group',
