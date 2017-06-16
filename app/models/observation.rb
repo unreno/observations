@@ -12,13 +12,9 @@ class Observation < ApplicationRecord
 
 #	NEED TO ADD THE DOB/VAC date comparison. Looks done
 
-#			.outer_join(o3).on(o1[:chirp_id].eq(o3[:chirp_id]))
-#			.where(o3[:concept].eq('mom_rco'))
-#			.where(o3[:value].eq('Washoe'))
-
 		inside_select = o1
 			.outer_join(o4).on(o1[:chirp_id].eq(o4[:chirp_id]))
-			.where(o1[:concept].eq('DEM:DOB'))
+			.where(o1[:concept].eq('dob'))
 			.where(o1[:value].matches('2015%'))
 			.where(o4[:concept].eq('vaccination_desc'))
 			.project(o1[:chirp_id])
@@ -93,14 +89,14 @@ class Observation < ApplicationRecord
 		o2at = Observation.arel_table.alias('o2')
 
 		o1 = o1at
-			.where(o1at[:concept].eq('DEM:DOB'))
+			.where(o1at[:concept].eq('dob'))
 			.where(o1at[:value].matches('2015%'))
 			.project("'Total Distinct CHIRP IDs' AS vaccination")
 			.project( o1at[:chirp_id].count(:distinct).as('count') )
 
 		o2 = o1at
 			.outer_join( o2at ).on( o1at[:chirp_id].eq(o2at[:chirp_id]) )
-			.where(o1at[:concept].eq('DEM:DOB'))
+			.where(o1at[:concept].eq('dob'))
 			.where(o1at[:value].matches('2015%'))
 			.where(o2at[:concept].eq('vaccination_desc'))
 			.project("'CHIRP IDs with WebIZ Match' AS vaccination")
@@ -108,7 +104,7 @@ class Observation < ApplicationRecord
 
 		o3 = o1at
 			.outer_join( o2at ).on( o1at[:chirp_id].eq(o2at[:chirp_id]) )
-			.where(o1at[:concept].eq('DEM:DOB'))
+			.where(o1at[:concept].eq('dob'))
 			.where(o1at[:value].matches('2015%'))
 			.where(o2at[:concept].eq('vaccination_desc'))
 			.project(o2at[:value].as('vaccination'))
@@ -141,7 +137,7 @@ class Observation < ApplicationRecord
 
 		results = Observation
 			.joins( outer(o3at, o1at[:chirp_id].eq(o3at[:chirp_id])) )
-			.where( o1at[:concept].eq('DEM:DOB') )
+			.where( o1at[:concept].eq('dob') )
 			.where( o1at[:value].matches('2015%') )
 			.where( o3at[:concept].eq('vaccination_desc') )
 			.group( group_year_vac, group_month_vac )
@@ -162,16 +158,16 @@ class Observation < ApplicationRecord
 		o2at = Observation.arel_table.alias('o2')
 
 		weight = Arel::Nodes::NamedFunction.new("CAST", [o1at[:value].as("INT")], "weight")
-		mom_age = Arel::Nodes::NamedFunction.new("CAST", [o2at[:value].as("INT")], "mom_age")
+		mom_age = Arel::Nodes::NamedFunction.new("CAST", [o2at[:value].as("INT")], "b2_mother_age")
 
 		Observation
 			.joins( outer(o2at, o1at[:chirp_id].eq(o2at[:chirp_id])) )
-			.where( o1at[:concept].eq 'DEM:Weight' )
+			.where( o1at[:concept].eq 'birth_weight_grams' )
 			.where( o1at[:units].eq 'grams' )
 			.where( o1at[:source_table].eq 'births' )
-			.where( o2at[:concept].eq 'mom_age' )
+			.where( o2at[:concept].eq 'b2_mother_age' )
 			.where( o2at[:source_table].eq 'births' )
-			.select( weight, mom_age )
+			.select( weight, mom_age.as('mom_age') )
 	end
 
 	def self.birth_weight_to_tot_cigs
@@ -182,10 +178,10 @@ class Observation < ApplicationRecord
 		o5at = Observation.arel_table.alias('o5')
 
 		weight = Arel::Nodes::NamedFunction.new("CAST", [o1at[:value].as("INT")], "weight")
-		prepreg_cig = Arel::Nodes::NamedFunction.new("CAST", [o2at[:value].as("INT")], "prepreg_cig")
-		first_cig = Arel::Nodes::NamedFunction.new("CAST", [o3at[:value].as("INT")], "first_cig")
-		sec_cig = Arel::Nodes::NamedFunction.new("CAST", [o4at[:value].as("INT")], "sec_cig")
-		last_cig = Arel::Nodes::NamedFunction.new("CAST", [o5at[:value].as("INT")], "last_cig")
+		prepreg_cig = Arel::Nodes::NamedFunction.new("CAST", [o2at[:value].as("INT")], "b2_mother_cig_prev")
+		first_cig = Arel::Nodes::NamedFunction.new("CAST", [o3at[:value].as("INT")], "b2_mother_cig_first_tri")
+		sec_cig = Arel::Nodes::NamedFunction.new("CAST", [o4at[:value].as("INT")], "b2_mother_cig_second_tri")
+		last_cig = Arel::Nodes::NamedFunction.new("CAST", [o5at[:value].as("INT")], "b2_mother_cig_last_tri")
 
 #	Not quite there yet.
 #		tot_cigs = Arel::Nodes::Addition.new(
@@ -201,16 +197,16 @@ class Observation < ApplicationRecord
 			.joins( outer(o3at, o1at[:chirp_id].eq(o3at[:chirp_id])) )
 			.joins( outer(o4at, o1at[:chirp_id].eq(o4at[:chirp_id])) )
 			.joins( outer(o5at, o1at[:chirp_id].eq(o5at[:chirp_id])) )
-			.where( o1at[:concept].eq 'DEM:Weight' )
+			.where( o1at[:concept].eq 'birth_weight' )
 			.where( o1at[:units].eq 'grams' )
 			.where( o1at[:source_table].eq 'births' )
-			.where( o2at[:concept].eq('prepreg_cig') )
+			.where( o2at[:concept].eq('b2_mother_cig_prev') )
 			.where( o2at[:value].not_eq('99') )
-			.where( o3at[:concept].eq('first_cig') )
+			.where( o3at[:concept].eq('b2_mother_cig_first_tri') )
 			.where( o3at[:value].not_eq('99') )
-			.where( o4at[:concept].eq('sec_cig') )
+			.where( o4at[:concept].eq('b2_mother_cig_second_tri') )
 			.where( o4at[:value].not_eq('99') )
-			.where( o5at[:concept].eq('last_cig') )
+			.where( o5at[:concept].eq('b2_mother_cig_last_tri') )
 			.where( o5at[:value].not_eq('99') )
 			.select( o1at[:chirp_id], weight, prepreg_cig, first_cig, sec_cig, last_cig,
 				"( 90*CAST( o2.value AS INT ) + 90*CAST( o3.value AS INT ) + 90*CAST( o4.value AS INT ) + 90*CAST( o5.value AS INT ) ) AS tot_cigs" )	#, tot_cigs)
@@ -243,19 +239,19 @@ class Observation < ApplicationRecord
 		outside_select = Observation.from(grouping_sql.to_sql)
 			.select( o1at[:value].as 'value' )
 			.select( o1at[:value].count.as 'count' )
-			.select( o2at[:value].as 'bwt_grp' )
+			.select( o2at[:value].as 'birth_weight_group')
 			.select( grouping[:total].as 'total' )
 			.outer_join( o1at ).on( o1at[:value].eq( grouping[:name]))
 			.where( o1at[:concept].eq field )
 			.where( o1at[:source_table].eq 'births' )
 			.outer_join( o2at ).on( o1at[:chirp_id].eq( o2at[:chirp_id]))
-			.where( o2at[:concept].eq 'bwt_grp' )
+			.where( o2at[:concept].eq 'birth_weight_group')
 			.group( o1at[:value], o2at[:value], grouping[:total] )
 			.order( o1at[:value] )
 
 #	SELECT `observations`.`value`, 
 #		COUNT(`observations`.`value`) AS count, 
-#		`o2`.`value` AS bwt_grp, 
+#		`o2`.`value` AS UNR:BirthWeightGroup, 
 #		`grouping`.`total` AS group_total 
 #	FROM (
 #		SELECT `observations`.`value` AS name, COUNT(`observations`.`value`) AS total 
@@ -265,7 +261,7 @@ class Observation < ApplicationRecord
 #	) grouping 
 #	LEFT OUTER JOIN `observations` ON `observations`.`value` = `grouping`.`name` 
 #	LEFT OUTER JOIN `observations` `o2` ON `observations`.`chirp_id` = `o2`.`chirp_id` 
-#	WHERE `observations`.`concept` = 'DEM:Zip' AND `o2`.`concept` = 'bwt_grp' 
+#	WHERE `observations`.`concept` = 'DEM:Zip' AND `o2`.`concept` = 'UNR:BirthWeightGroup' 
 #	GROUP BY `observations`.`value`, `o2`.`value`
 
 	end
@@ -276,12 +272,12 @@ class Observation < ApplicationRecord
 
 		Observation
 			.joins( outer(o2at, o1at[:chirp_id].eq(o2at[:chirp_id])) )
-			.where( o1at[:concept].eq 'bwt_grp' )
+			.where( o1at[:concept].eq 'birth_weight_group')
 			.where( o1at[:source_table].eq 'births' )
 			.where( o2at[:concept].eq field )
 			.where( o2at[:source_table].eq 'births' )
 			.group( o1at[:value], o2at[:value] )
-			.select( o1at[:value].as('bwt_grp'), o2at[:value] )
+			.select( o1at[:value].as('birth_weight_group'), o2at[:value] )
 			.select( o1at[:chirp_id].count(:distinct).as('count') )
 	end
 
@@ -309,10 +305,10 @@ class Observation < ApplicationRecord
 
 		Observation
 			.joins( outer(o2at, o1at[:chirp_id].eq(o2at[:chirp_id])) )
-			.where( o1at[:concept].eq 'DEM:Weight' )
+			.where( o1at[:concept].eq 'birth_weight_grams' )
 			.where( o1at[:units].eq 'grams' )
 			.where( o1at[:source_table].eq 'births' )
-			.where( o2at[:concept].eq 'DEM:Zip' )
+			.where( o2at[:concept].eq 'birth_zip' )
 			.where( o2at[:source_table].eq 'births' )
 			.group( o2at[:value] )
 			.select( ave_weight.as('weight'), o2at[:value].as('zip') )
@@ -326,12 +322,12 @@ class Observation < ApplicationRecord
 		Observation
 			.joins( outer(o2at, o1at[:chirp_id].eq(o2at[:chirp_id])) )
 			.joins( outer(o4at, o1at[:chirp_id].eq(o4at[:chirp_id])) )
-			.where( o1at[:concept].eq 'DEM:Weight' )
+			.where( o1at[:concept].eq 'birth_weight_grams' )
 			.where( o1at[:units].eq 'grams' )
 			.where( o1at[:source_table].eq 'births' )
-			.where( o2at[:concept].eq 'bwt_grp' )
+			.where( o2at[:concept].eq 'birth_weight_group' )
 			.where( o2at[:source_table].eq 'births' )
-			.where( o4at[:concept].eq('DEM:Zip') )
+			.where( o4at[:concept].eq('birth_zip') )
 			.where( o4at[:source_table].eq 'births' )
 			.select( o1at[:value].as('weight'), o2at[:value].as('wgroup'), o4at[:value].as('zip') )
 	end

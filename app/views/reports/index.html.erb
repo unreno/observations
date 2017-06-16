@@ -5,22 +5,24 @@
 	<li><%= link_to "Ave Birth Weight to Zip Map", ave_birth_weight_to_zip_reports_path %></li>
 	<li><%= link_to "Birth Weight Group to Percent of Zip", birth_weight_group_to_percent_of_reports_path(v: 'DEM:ZIP') %></li>
 <!--
-	<li><%= link_to "Birth Weight Group to prepreg_cig", birth_weight_group_to_path(v: :prepreg_cig) %></li>
-	<li><%= link_to "Birth Weight Group to first_cig", birth_weight_group_to_path(v: :first_cig) %></li>
-	<li><%= link_to "Birth Weight Group to sec_cig", birth_weight_group_to_path(v: :sec_cig) %></li>
-	<li><%= link_to "Birth Weight Group to last_cig", birth_weight_group_to_path(v: :last_cig) %></li>
+	<li><%= link_to "Birth Weight Group to Pre-pregnancy Cigarettes", birth_weight_group_to_path(v: :b2_mother_cig_prev) %></li>
+	<li><%= link_to "Birth Weight Group to First Trimester Cigarettes", birth_weight_group_to_path(v: :b2_mother_cig_first_tri) %></li>
+	<li><%= link_to "Birth Weight Group to Second Trimester Cigarettes", birth_weight_group_to_path(v: :b2_mother_cig_second_tri) %></li>
+	<li><%= link_to "Birth Weight Group to Last Trimester Cigarettes", birth_weight_group_to_path(v: :b2_mother_cig_last_tri) %></li>
 -->
 	<li><%= link_to "Birth Weight Group to Zip", birth_weight_group_to_path(v: 'DEM:ZIP') %></li>
-	<li><%= link_to "Birth Weight Group to Mom Alcohol Use", birth_weight_group_to_path(v: :alcohol) %></li>
-	<li><%= link_to "Birth Weight Group to Mom Drug Use", birth_weight_group_to_path(v: :drug_use) %></li>
-	<li><%= link_to "Birth Weight Group to Mom OTC Drug Use", birth_weight_group_to_path(v: :du_otc) %></li>
-	<li><%= link_to "Birth Weight Group to Mom Prescription Drug Use", birth_weight_group_to_path(v: :du_prscr) %></li>
-	<li><%= link_to "Birth Weight Group to Mom Age Group", birth_weight_group_to_path(v: :mom_age1) %></li>
+	<li><%= link_to "Birth Weight Group to Mom Alcohol Use", birth_weight_group_to_path(v: :m_alcohol_use) %></li>
+	<li><%= link_to "Birth Weight Group to Mom Drug Use", birth_weight_group_to_path(v: :m_drug_use) %></li>
+	<li><%= link_to "Birth Weight Group to Mom OTC Drug Use", birth_weight_group_to_path(v: :m_drug_otc) %></li>
+	<li><%= link_to "Birth Weight Group to Mom Prescription Drug Use", birth_weight_group_to_path(v: :m_drug_prescription) %></li>
+	<li><%= link_to "Birth Weight Group to Mom Age Group", birth_weight_group_to_path(v: :mother_age_group) %></li>
 	<li><%= link_to "Birth Weight Group to Mom Race", birth_weight_group_to_path(v: :mom_race1) %></li>
 	<li><%= link_to "Birth Weight Group to Mom Race ethnchs", birth_weight_group_to_path(v: :momrace_ethnchs) %></li>
-	<li><%= link_to "Birth Weight Group to Source Pay", birth_weight_group_to_path(v: :source_pay) %></li>
-	<li><%= link_to "Birth Weight Group to Mom Tobacco Use", birth_weight_group_to_path(v: :tobacco) %></li>
-	<li><%= link_to "Birth Weight Group to Prenatal Care", birth_weight_group_to_path(v: :prenatal) %></li>
+	<li><%= link_to "Birth Weight Group to Source Pay", birth_weight_group_to_path(v: :b2_source_pay_code) %></li>
+	<li><%= link_to "Birth Weight Group to Mom Tobacco Use", birth_weight_group_to_path(v: :b2_tobacco_use) %></li>
+	<li><%= link_to "Birth Weight Group to Prenatal Care", birth_weight_group_to_path(v: :b2_prenatal_yesno) %></li>
+	<li><%= link_to "Birth Weight Group to WIC", birth_weight_group_to_path(v: :b2_mother_wic_yesno) %></li>
+	<li><%= link_to "Birth Weight Group to Breastfeeding", birth_weight_group_to_path(v: :m_breastfeeding) %></li>
 	<li><%= link_to "Birth Weight to Mom Age", birth_weight_to_mom_age_reports_path %></li>
 	<li><%= link_to "Birth Weight to Tot Cigs", birth_weight_to_tot_cigs_reports_path %></li>
 	<li><%= link_to "Completed Immunization Counts for DOB 2015", completed_immunizations_reports_path %></li>

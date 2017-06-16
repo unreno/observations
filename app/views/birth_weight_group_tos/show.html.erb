@@ -4,7 +4,7 @@
 
 <% 
 	group_order = [ "Very Low Birth Weight (<1,500g)", "Low Birth Weight (>=1,500g, <2,500g)", "Normal Birth Weight (>=2,500g, <=8,000g)" ]
-	sorted_results = @results.sort_by{|r| group_order.index r.bwt_grp }
+	sorted_results = @results.sort_by{|r| group_order.index r.birth_weight_group }
 %>
 
 
@@ -23,7 +23,7 @@
 <tbody>
 <% sorted_results.each do |result| %>
 	<tr>
-		<td><%= result['bwt_grp'] %></td>
+		<td><%= result['birth_weight_group'] %></td>
 		<td><%= result['value'] %></td>
 		<td><%= result['count'] %></td>
 	</tr>
@@ -47,7 +47,7 @@ data[<%=i%>] = {
 	x: groups,
 	y: [<%= group_order.collect{|group| 
 			sorted_results.find{|r| 
-				r['bwt_grp'] == group and r['value'] == value }.try(:count)||0 }.join(", ").html_safe %>],
+				r['birth_weight_group'] == group and r['value'] == value }.try(:count)||0 }.join(", ").html_safe %>],
 	name: '<%=value.html_safe%>',
 	type: 'bar'
 };
