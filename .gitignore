@@ -16,7 +16,7 @@
 !/log/.keep
 /tmp
 
-/misc/Observations*
+/misc/*Observations*
 /coverage/
 /config/database.yml
 /config/secrets.yml

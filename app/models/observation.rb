@@ -7,21 +7,19 @@ class Observation < ApplicationRecord
 	#
 	def self.completed_immunizations
 		o1=Observation.arel_table # same as o1=Arel::Table.new('observations'), can't alias
-		o2=o1.alias('o2')
 		o3=o1.alias('o3')
 		o4=o1.alias('o4')
 
 #	NEED TO ADD THE DOB/VAC date comparison. Looks done
 
-		inside_select = o1.outer_join(o2).on(o1[:chirp_id].eq(o2[:chirp_id]))
-			.outer_join(o3).on(o1[:chirp_id].eq(o3[:chirp_id]))
+#			.outer_join(o3).on(o1[:chirp_id].eq(o3[:chirp_id]))
+#			.where(o3[:concept].eq('mom_rco'))
+#			.where(o3[:value].eq('Washoe'))
+
+		inside_select = o1
 			.outer_join(o4).on(o1[:chirp_id].eq(o4[:chirp_id]))
 			.where(o1[:concept].eq('DEM:DOB'))
 			.where(o1[:value].matches('2015%'))
-			.where(o2[:concept].eq('birth_co'))
-			.where(o2[:value].eq('Washoe'))
-			.where(o3[:concept].eq('mom_rco'))
-			.where(o3[:value].eq('Washoe'))
 			.where(o4[:concept].eq('vaccination_desc'))
 			.project(o1[:chirp_id])
 			.project("CAST( observations.value AS DATE ) AS dob")
@@ -134,7 +132,6 @@ class Observation < ApplicationRecord
 
 	def self.individual_vaccination_counts_by_month_year
 		o1at = Observation.arel_table	#	don't think that I can alias the initial table
-		o2at = Observation.arel_table.alias('o2')
 		o3at = Observation.arel_table.alias('o3')
 
 		group_year_vac = Arel::Nodes::NamedFunction.new("YEAR", [o3at[:started_at]])
@@ -143,12 +140,9 @@ class Observation < ApplicationRecord
 		month_vac = Arel::Nodes::NamedFunction.new("MONTH", [o3at[:started_at]], "month")
 
 		results = Observation
-			.joins( outer(o2at, o1at[:chirp_id].eq(o2at[:chirp_id])) )
 			.joins( outer(o3at, o1at[:chirp_id].eq(o3at[:chirp_id])) )
 			.where( o1at[:concept].eq('DEM:DOB') )
 			.where( o1at[:value].matches('2015%') )
-			.where( o2at[:concept].eq('birth_co') )
-			.where( o2at[:value].eq('Washoe') )
 			.where( o3at[:concept].eq('vaccination_desc') )
 			.group( group_year_vac, group_month_vac )
 			.order( group_year_vac, group_month_vac )
@@ -166,21 +160,17 @@ class Observation < ApplicationRecord
 	def self.birth_weight_to_mom_age
 		o1at = Observation.arel_table	#	don't think that I can alias the initial table
 		o2at = Observation.arel_table.alias('o2')
-		o3at = Observation.arel_table.alias('o3')
 
 		weight = Arel::Nodes::NamedFunction.new("CAST", [o1at[:value].as("INT")], "weight")
 		mom_age = Arel::Nodes::NamedFunction.new("CAST", [o2at[:value].as("INT")], "mom_age")
 
 		Observation
 			.joins( outer(o2at, o1at[:chirp_id].eq(o2at[:chirp_id])) )
-			.joins( outer(o3at, o1at[:chirp_id].eq(o3at[:chirp_id])) )
 			.where( o1at[:concept].eq 'DEM:Weight' )
 			.where( o1at[:units].eq 'grams' )
 			.where( o1at[:source_table].eq 'births' )
 			.where( o2at[:concept].eq 'mom_age' )
 			.where( o2at[:source_table].eq 'births' )
-			.where( o3at[:concept].eq('birth_co') )
-			.where( o3at[:value].eq('Washoe') )
 			.select( weight, mom_age )
 	end
 
@@ -190,13 +180,12 @@ class Observation < ApplicationRecord
 		o3at = Observation.arel_table.alias('o3')
 		o4at = Observation.arel_table.alias('o4')
 		o5at = Observation.arel_table.alias('o5')
-		o6at = Observation.arel_table.alias('o6')
 
-		weight = Arel::Nodes::NamedFunction.new("CAST", [o2at[:value].as("INT")], "weight")
-		prepreg_cig = Arel::Nodes::NamedFunction.new("CAST", [o3at[:value].as("INT")], "prepreg_cig")
-		first_cig = Arel::Nodes::NamedFunction.new("CAST", [o4at[:value].as("INT")], "first_cig")
-		sec_cig = Arel::Nodes::NamedFunction.new("CAST", [o5at[:value].as("INT")], "sec_cig")
-		last_cig = Arel::Nodes::NamedFunction.new("CAST", [o6at[:value].as("INT")], "last_cig")
+		weight = Arel::Nodes::NamedFunction.new("CAST", [o1at[:value].as("INT")], "weight")
+		prepreg_cig = Arel::Nodes::NamedFunction.new("CAST", [o2at[:value].as("INT")], "prepreg_cig")
+		first_cig = Arel::Nodes::NamedFunction.new("CAST", [o3at[:value].as("INT")], "first_cig")
+		sec_cig = Arel::Nodes::NamedFunction.new("CAST", [o4at[:value].as("INT")], "sec_cig")
+		last_cig = Arel::Nodes::NamedFunction.new("CAST", [o5at[:value].as("INT")], "last_cig")
 
 #	Not quite there yet.
 #		tot_cigs = Arel::Nodes::Addition.new(
@@ -212,22 +201,19 @@ class Observation < ApplicationRecord
 			.joins( outer(o3at, o1at[:chirp_id].eq(o3at[:chirp_id])) )
 			.joins( outer(o4at, o1at[:chirp_id].eq(o4at[:chirp_id])) )
 			.joins( outer(o5at, o1at[:chirp_id].eq(o5at[:chirp_id])) )
-			.joins( outer(o6at, o1at[:chirp_id].eq(o6at[:chirp_id])) )
-			.where( o1at[:concept].eq('birth_co') )
-			.where( o1at[:value].eq('Washoe') )
-			.where( o2at[:concept].eq 'DEM:Weight' )
-			.where( o2at[:units].eq 'grams' )
-			.where( o2at[:source_table].eq 'births' )
-			.where( o3at[:concept].eq('prepreg_cig') )
+			.where( o1at[:concept].eq 'DEM:Weight' )
+			.where( o1at[:units].eq 'grams' )
+			.where( o1at[:source_table].eq 'births' )
+			.where( o2at[:concept].eq('prepreg_cig') )
+			.where( o2at[:value].not_eq('99') )
+			.where( o3at[:concept].eq('first_cig') )
 			.where( o3at[:value].not_eq('99') )
-			.where( o4at[:concept].eq('first_cig') )
+			.where( o4at[:concept].eq('sec_cig') )
 			.where( o4at[:value].not_eq('99') )
-			.where( o5at[:concept].eq('sec_cig') )
+			.where( o5at[:concept].eq('last_cig') )
 			.where( o5at[:value].not_eq('99') )
-			.where( o6at[:concept].eq('last_cig') )
-			.where( o6at[:value].not_eq('99') )
 			.select( o1at[:chirp_id], weight, prepreg_cig, first_cig, sec_cig, last_cig,
-				"( 90*CAST( o3.value AS INT ) + 90*CAST( o4.value AS INT ) + 90*CAST( o5.value AS INT ) + 90*CAST( o6.value AS INT ) ) AS tot_cigs" )	#, tot_cigs)
+				"( 90*CAST( o2.value AS INT ) + 90*CAST( o3.value AS INT ) + 90*CAST( o4.value AS INT ) + 90*CAST( o5.value AS INT ) ) AS tot_cigs" )	#, tot_cigs)
 
 #	sadly no elegant arel way to add these columns found just yet
 #	Could use Arel::Nodes::Addition.new(a,b) [only takes 2 so would have to do multiple times]
@@ -239,16 +225,12 @@ class Observation < ApplicationRecord
 	def self.birth_weight_group_percents_to( field, as = nil )
 		o1at = Observation.arel_table	#	don't think that I can alias the initial table
 		o2at = o1at.alias('o2')
-		o3at = o1at.alias('o3')
 
 		grouping_table_name = 'grouping'
 
 		grouping_sql = o1at
 			.project( o1at[:value].as 'name' )
 			.project( o1at[:value].count.as 'total' )
-			.outer_join( o3at ).on( o1at[:chirp_id].eq( o3at[:chirp_id]))
-			.where( o3at[:concept].eq('birth_co') )
-			.where( o3at[:value].eq('Washoe') )
 			.where( o1at[:concept].eq field )
 			.where( o1at[:source_table].eq 'births' )
 			.group( o1at[:value] )
@@ -268,9 +250,6 @@ class Observation < ApplicationRecord
 			.where( o1at[:source_table].eq 'births' )
 			.outer_join( o2at ).on( o1at[:chirp_id].eq( o2at[:chirp_id]))
 			.where( o2at[:concept].eq 'bwt_grp' )
-			.outer_join( o3at ).on( o1at[:chirp_id].eq( o3at[:chirp_id]))
-			.where( o3at[:concept].eq('birth_co') )
-			.where( o3at[:value].eq('Washoe') )
 			.group( o1at[:value], o2at[:value], grouping[:total] )
 			.order( o1at[:value] )
 
@@ -294,17 +273,13 @@ class Observation < ApplicationRecord
 	def self.birth_weight_group_to( field, as = nil )
 		o1at = Observation.arel_table	#	don't think that I can alias the initial table
 		o2at = Observation.arel_table.alias('o2')
-		o3at = Observation.arel_table.alias('o3')
 
 		Observation
 			.joins( outer(o2at, o1at[:chirp_id].eq(o2at[:chirp_id])) )
-			.joins( outer(o3at, o1at[:chirp_id].eq(o3at[:chirp_id])) )
 			.where( o1at[:concept].eq 'bwt_grp' )
 			.where( o1at[:source_table].eq 'births' )
 			.where( o2at[:concept].eq field )
 			.where( o2at[:source_table].eq 'births' )
-			.where( o3at[:concept].eq('birth_co') )
-			.where( o3at[:value].eq('Washoe') )
 			.group( o1at[:value], o2at[:value] )
 			.select( o1at[:value].as('bwt_grp'), o2at[:value] )
 			.select( o1at[:chirp_id].count(:distinct).as('count') )
@@ -313,17 +288,13 @@ class Observation < ApplicationRecord
 	def self.birth_xy( x, y )
 		o1at = Observation.arel_table	#	don't think that I can alias the initial table
 		o2at = Observation.arel_table.alias('o2')
-		o3at = Observation.arel_table.alias('o3')
 
 		Observation
 			.joins( outer(o2at, o1at[:chirp_id].eq(o2at[:chirp_id])) )
-			.joins( outer(o3at, o1at[:chirp_id].eq(o3at[:chirp_id])) )
 			.where( o1at[:concept].eq x )
 			.where( o1at[:source_table].eq 'births' )
 			.where( o2at[:concept].eq y )
 			.where( o2at[:source_table].eq 'births' )
-			.where( o3at[:concept].eq('birth_co') )
-			.where( o3at[:value].eq('Washoe') )
 			.group( o1at[:value], o2at[:value] )
 			.select( o1at[:value].as('x'), o2at[:value].as('y') )
 			.select( o1at[:chirp_id].count(:distinct).as('count') )
@@ -332,21 +303,17 @@ class Observation < ApplicationRecord
 	def self.ave_birth_weight_to_zip
 		o1at = Observation.arel_table	#	don't think that I can alias the initial table
 		o2at = Observation.arel_table.alias('o2')
-		o3at = Observation.arel_table.alias('o3')
 
 		weight = Arel::Nodes::NamedFunction.new("CAST", [o1at[:value].as("INT")])	#, 'weight')
 		ave_weight = Arel::Nodes::NamedFunction.new("AVG", [weight])	#, 'avg_weight')
 
 		Observation
 			.joins( outer(o2at, o1at[:chirp_id].eq(o2at[:chirp_id])) )
-			.joins( outer(o3at, o1at[:chirp_id].eq(o3at[:chirp_id])) )
 			.where( o1at[:concept].eq 'DEM:Weight' )
 			.where( o1at[:units].eq 'grams' )
 			.where( o1at[:source_table].eq 'births' )
 			.where( o2at[:concept].eq 'DEM:Zip' )
 			.where( o2at[:source_table].eq 'births' )
-			.where( o3at[:concept].eq('birth_co') )
-			.where( o3at[:value].eq('Washoe') )
 			.group( o2at[:value] )
 			.select( ave_weight.as('weight'), o2at[:value].as('zip') )
 	end
@@ -354,20 +321,16 @@ class Observation < ApplicationRecord
 	def self.birth_weight_birth_weight_group_check
 		o1at = Observation.arel_table	#	don't think that I can alias the initial table
 		o2at = Observation.arel_table.alias('o2')
-		o3at = Observation.arel_table.alias('o3')
 		o4at = Observation.arel_table.alias('o4')
 
 		Observation
 			.joins( outer(o2at, o1at[:chirp_id].eq(o2at[:chirp_id])) )
-			.joins( outer(o3at, o1at[:chirp_id].eq(o3at[:chirp_id])) )
 			.joins( outer(o4at, o1at[:chirp_id].eq(o4at[:chirp_id])) )
 			.where( o1at[:concept].eq 'DEM:Weight' )
 			.where( o1at[:units].eq 'grams' )
 			.where( o1at[:source_table].eq 'births' )
 			.where( o2at[:concept].eq 'bwt_grp' )
 			.where( o2at[:source_table].eq 'births' )
-			.where( o3at[:concept].eq('birth_co') )
-			.where( o3at[:value].eq('Washoe') )
 			.where( o4at[:concept].eq('DEM:Zip') )
 			.where( o4at[:source_table].eq 'births' )
 			.select( o1at[:value].as('weight'), o2at[:value].as('wgroup'), o4at[:value].as('zip') )

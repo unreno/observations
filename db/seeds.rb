@@ -46,15 +46,22 @@ if ActiveRecord::Base.connection_config[:adapter] == 'sqlserver'
 	EOF
 	puts sql
 elsif ActiveRecord::Base.connection_config[:adapter] == 'mysql2'
+#	LOAD DATA LOCAL INFILE 'misc/Observations-20170302.tsv' INTO TABLE observations
+#	LOAD DATA LOCAL INFILE 'misc/DEVObservations-20170615-head.tsv' INTO TABLE observations
 	sql =<<-EOF
-	LOAD DATA LOCAL INFILE 'misc/Observations-20170302.tsv' INTO TABLE observations
+	LOAD DATA LOCAL INFILE 'misc/DEVObservations-20170615.tsv' INTO TABLE observations
 	LINES TERMINATED BY '\r\n'
 	IGNORE 1 LINES;
 	EOF
 	puts sql
 end
 
+#	BEWARE! THIS DOES NOT APPEND! 
+#	As it includes the ID, it will try and fail to
+#	overwrite the records and fails silently.
 ActiveRecord::Base.connection.execute(sql);
+
+
 
 #USE [observations_production]
 #GO
