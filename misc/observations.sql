@@ -1,5 +1,5 @@
 
---	Structure from SQL Server soiurce table.
+--	Structure from SQL Server source table.
 
 
 CREATE TABLE dbo.observations (
