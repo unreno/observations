@@ -17,7 +17,7 @@ CASE
 	WHEN value >= 18 THEN '18-19'
 	WHEN value >= 15 THEN '15-17'
 	WHEN value >= 10 THEN '10-14'
-	ELSE "Under 10"
+	ELSE 'Under 10'
 END , '', value, downloaded_at, source_schema, source_table, source_id, imported_at
 FROM observations
 WHERE concept = 'b2_mother_age';
