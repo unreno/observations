@@ -37,19 +37,21 @@
 #	The above is just WAY TOO LONG. The following takes about 3 seconds.
 
 
+
+filename="Observations-20170619.tsv"
+
+
 if ActiveRecord::Base.connection_config[:adapter] == 'sqlserver'
 	sql =<<-EOF
 	DECLARE @bulk_cmd VARCHAR(1000) = 'BULK INSERT observations 
-	FROM ''/home/jakewendt/github/unreno/observations/misc/Observations-20170302.tsv'' 
+	FROM ''/home/jakewendt/github/unreno/observations/misc/#{filename}'' 
 	WITH ( ROWTERMINATOR = '''+CHAR(10)+''', FIRSTROW = 2, TABLOCK)';
 	EXEC(@bulk_cmd);
 	EOF
 	puts sql
 elsif ActiveRecord::Base.connection_config[:adapter] == 'mysql2'
-#	LOAD DATA LOCAL INFILE 'misc/Observations-20170302.tsv' INTO TABLE observations
-#	LOAD DATA LOCAL INFILE 'misc/DEVObservations-20170615-head.tsv' INTO TABLE observations
 	sql =<<-EOF
-	LOAD DATA LOCAL INFILE 'misc/DEVObservations-20170615.tsv' INTO TABLE observations
+	LOAD DATA LOCAL INFILE 'misc/#{filename}' INTO TABLE observations
 	LINES TERMINATED BY '\r\n'
 	IGNORE 1 LINES;
 	EOF
