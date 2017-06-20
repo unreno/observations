@@ -197,7 +197,7 @@ class Observation < ApplicationRecord
 			.joins( outer(o3at, o1at[:chirp_id].eq(o3at[:chirp_id])) )
 			.joins( outer(o4at, o1at[:chirp_id].eq(o4at[:chirp_id])) )
 			.joins( outer(o5at, o1at[:chirp_id].eq(o5at[:chirp_id])) )
-			.where( o1at[:concept].eq 'birth_weight' )
+			.where( o1at[:concept].eq 'birth_weight_grams' )
 			.where( o1at[:units].eq 'grams' )
 			.where( o1at[:source_table].eq 'births' )
 			.where( o2at[:concept].eq('b2_mother_cig_prev') )
@@ -306,8 +306,8 @@ class Observation < ApplicationRecord
 		Observation
 			.joins( outer(o2at, o1at[:chirp_id].eq(o2at[:chirp_id])) )
 			.where( o1at[:concept].eq 'birth_weight_grams' )
-			.where( o1at[:units].eq 'grams' )
 			.where( o1at[:source_table].eq 'births' )
+			.where( o1at[:units].eq 'grams' )
 			.where( o2at[:concept].eq 'birth_zip' )
 			.where( o2at[:source_table].eq 'births' )
 			.group( o2at[:value] )

@@ -56,7 +56,7 @@ data[<%=i%>] = {
 var layout = {
 	hovermode: 'closest',
 	barmode: 'group',
-	title: 'Birth Weight Group to <%=@value%>',
+	title: "Birth Weight Group to <%=@value.html_safe%>",
 	xaxis: {
 		title: 'Birth Weight Group'
 	},
