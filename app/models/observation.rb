@@ -332,4 +332,36 @@ class Observation < ApplicationRecord
 			.select( o1at[:value].as('weight'), o2at[:value].as('wgroup'), o4at[:value].as('zip') )
 	end
 
+	def self.parallel_coord_test
+		o1at = Observation.arel_table	#	don't think that I can alias the initial table
+		o2at = Observation.arel_table.alias('o2')
+		o3at = Observation.arel_table.alias('o3')
+		o4at = Observation.arel_table.alias('o4')
+		o5at = Observation.arel_table.alias('o5')
+		o6at = Observation.arel_table.alias('o6')
+
+		weight = Arel::Nodes::NamedFunction.new("CAST", [o1at[:value].as("INT")], "birth_weight_grams")
+		age = Arel::Nodes::NamedFunction.new("CAST", [o2at[:value].as("INT")], "mother_age")
+		alcohol_use = Arel::Nodes::NamedFunction.new("CAST", [o3at[:value].as("INT")], "alcohol_use")
+		drug_use = Arel::Nodes::NamedFunction.new("CAST", [o4at[:value].as("INT")], "drug_use")
+		tobacco_use = Arel::Nodes::NamedFunction.new("CAST", [o5at[:value].as("INT")], "tobacco_use")
+		prenatal_care = Arel::Nodes::NamedFunction.new("CAST", [o6at[:value].as("INT")], "prenatal_care")
+
+		Observation
+			.joins( outer(o2at, o1at[:chirp_id].eq(o2at[:chirp_id])) )
+			.joins( outer(o3at, o1at[:chirp_id].eq(o3at[:chirp_id])) )
+			.joins( outer(o4at, o1at[:chirp_id].eq(o4at[:chirp_id])) )
+			.joins( outer(o5at, o1at[:chirp_id].eq(o5at[:chirp_id])) )
+			.joins( outer(o6at, o1at[:chirp_id].eq(o6at[:chirp_id])) )
+			.where( o1at[:concept].eq 'birth_weight_grams' )
+			.where( o1at[:value].not_eq '8888' )
+			.where( o2at[:concept].eq('b2_mother_age') )
+			.where( o2at[:value].not_eq '99' )
+			.where( o3at[:concept].eq('m_alcohol_use') )
+			.where( o4at[:concept].eq('m_drug_use') )
+			.where( o5at[:concept].eq('b2_tobacco_use') )
+			.where( o6at[:concept].eq('b2_prenatal_yesno') )
+			.select( weight, age, alcohol_use, drug_use, tobacco_use, prenatal_care )
+	end
+
 end

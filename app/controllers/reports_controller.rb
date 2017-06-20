@@ -1,5 +1,9 @@
 class ReportsController < ApplicationController
 
+	def parallel_coords
+		@results = Observation.parallel_coord_test
+	end
+
 	def ave_birth_weight_to_zip
 		@results = Observation.ave_birth_weight_to_zip
 	end

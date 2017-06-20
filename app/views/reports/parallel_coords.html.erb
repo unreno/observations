@@ -1,0 +1,54 @@
+<div id="graphDiv"></div>
+
+<script type="text/javascript">
+//<![CDATA[
+
+var data = [{
+	type: 'parcoords',
+	line: {
+		showscale: true,
+		reversescale: true,
+		colorscale: 'Jet',
+		cmin: 0,
+		cmax: 5000,
+		color: <%= @results.collect(&:birth_weight_grams) %>
+	},
+	dimensions: [
+		{
+			label: 'Birth Weight Grams',
+			range: [0,5000],
+			values: <%= @results.collect(&:birth_weight_grams) %>
+		}, {
+			label: 'Mother Age',
+			range: [0,100],
+			values: <%= @results.collect(&:mother_age) %>
+		}, {
+			label: 'Alcohol Use',
+			range: [0,10],
+			values: <%= @results.collect(&:alcohol_use) %>
+		}, {
+			label: 'Drug Use',
+			range: [0,10],
+			values: <%= @results.collect(&:drug_use) %>
+		}, {
+			label: 'Tobacco Use',
+			range: [0,10],
+			values: <%= @results.collect(&:tobacco_use) %>
+		}, {
+			label: 'Prenatal Care',
+			range: [0,10],
+			values: <%= @results.collect(&:prenatal_care) %>
+		}
+	]
+}];
+	
+//$(function(){
+$(document).on('turbolinks:load', function() {
+
+	Plotly.plot('graphDiv', data);
+	
+});
+
+//]]>
+
+</script>

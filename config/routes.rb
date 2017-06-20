@@ -2,6 +2,7 @@ Rails.application.routes.draw do
 
 	resources :reports, only: :index do
 		collection do
+			get :parallel_coords
 			get :completed_immunizations
 			get :individual_vaccination_counts_by_month_year
 			get :total_vaccination_counts
