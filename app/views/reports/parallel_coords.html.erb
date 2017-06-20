@@ -10,13 +10,13 @@ var data = [{
 		reversescale: true,
 		colorscale: 'Jet',
 		cmin: 0,
-		cmax: 5000,
+		cmax: 6500,
 		color: <%= @results.collect(&:birth_weight_grams) %>
 	},
 	dimensions: [
 		{
 			label: 'Birth Weight Grams',
-			range: [0,5000],
+			range: [0,6500],
 			values: <%= @results.collect(&:birth_weight_grams) %>
 		}, {
 			label: 'Mother Age',
@@ -24,11 +24,11 @@ var data = [{
 			values: <%= @results.collect(&:mother_age) %>
 		}, {
 			label: 'Pre Preg Weight',
-			range: [0,300],
+			range: [0,450],
 			values: <%= @results.collect(&:pre_preg_weight) %>
 		}, {
 			label: 'Delivery Weight',
-			range: [0,300],
+			range: [0,450],
 			values: <%= @results.collect(&:delivery_weight) %>
 		}, {
 			label: 'Alcohol Use',
