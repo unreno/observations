@@ -13,7 +13,9 @@ class CreateObservations < ActiveRecord::Migration[5.0]
 			t.string :value
 			t.index :value
 			t.string :units, limit: 20
+			t.index :units
 			t.string :raw
+			t.index :raw
 			t.datetime :downloaded_at
 			t.string :source_schema, limit: 50
 			t.string :source_table, limit: 50

@@ -23,6 +23,14 @@ var data = [{
 			range: [0,100],
 			values: <%= @results.collect(&:mother_age) %>
 		}, {
+			label: 'Pre Preg Weight',
+			range: [0,300],
+			values: <%= @results.collect(&:pre_preg_weight) %>
+		}, {
+			label: 'Delivery Weight',
+			range: [0,300],
+			values: <%= @results.collect(&:delivery_weight) %>
+		}, {
 			label: 'Alcohol Use',
 			range: [0,10],
 			values: <%= @results.collect(&:alcohol_use) %>

@@ -29,7 +29,9 @@ ActiveRecord::Schema.define(version: 20170223213101) do
     t.index ["chirp_id", "started_at"], name: "index_observations_on_chirp_id_and_started_at", using: :btree
     t.index ["chirp_id"], name: "index_observations_on_chirp_id", using: :btree
     t.index ["concept"], name: "index_observations_on_concept", using: :btree
+    t.index ["raw"], name: "index_observations_on_raw", using: :btree
     t.index ["started_at"], name: "index_observations_on_started_at", using: :btree
+    t.index ["units"], name: "index_observations_on_units", using: :btree
     t.index ["value"], name: "index_observations_on_value", using: :btree
   end
 
