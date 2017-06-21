@@ -1,5 +1,13 @@
 class ReportsController < ApplicationController
 
+	def birth_counts_by_quarter
+		@results = Observation.birth_counts_by_quarter
+	end
+
+	def birth_counts_by_month
+		@results = Observation.birth_counts_by_month
+	end
+
 	def parallel_coords
 		@results = Observation.parallel_coord_test
 	end

@@ -392,4 +392,49 @@ class Observation < ApplicationRecord
 #			.limit(10)
 	end
 
+	def self.birth_counts_by_month
+		o1at = Observation.arel_table
+		o2at = Observation.arel_table.alias('o2')
+
+		birth_month = Arel::Nodes::NamedFunction.new("MONTH", [o1at[:value]], 'birth_month')
+		birth_year = Arel::Nodes::NamedFunction.new("YEAR", [o1at[:value]], 'birth_year')
+		group_birth_month = Arel::Nodes::NamedFunction.new("MONTH", [o1at[:value]])
+		group_birth_year = Arel::Nodes::NamedFunction.new("YEAR", [o1at[:value]])
+
+		Observation
+			.joins( outer(o2at, o1at[:chirp_id].eq(o2at[:chirp_id])) )
+			.where( o1at[:concept].eq 'dob' )
+			.where( o2at[:concept].eq 'sex' )
+			.where( o2at[:raw].in( ['1','2']) )
+			.group( group_birth_month, group_birth_year, o2at[:value] )
+			.select( birth_month, birth_year, o2at[:value].as('sex') )
+			.select("COUNT(1) AS count")
+			.order( group_birth_year, group_birth_month, o2at[:raw] )
+
+#	this, for some reason, gets passed on to the group call as well.
+#			.select( birth_month.as('birth_month'), birth_year.as('birth_year'), o2at[:value].as('sex') )
+#	need an alias so can get them so need to create 2 named functions for each.
+	end
+
+	def self.birth_counts_by_quarter
+		o1at = Observation.arel_table
+		o2at = Observation.arel_table.alias('o2')
+		o3at = Observation.arel_table.alias('o3')
+
+		birth_year = Arel::Nodes::NamedFunction.new("YEAR", [o1at[:value]], 'birth_year')
+		group_birth_year = Arel::Nodes::NamedFunction.new("YEAR", [o1at[:value]])
+
+		Observation
+			.joins( outer(o2at, o1at[:chirp_id].eq(o2at[:chirp_id])) )
+			.joins( outer(o3at, o1at[:chirp_id].eq(o3at[:chirp_id])) )
+			.where( o1at[:concept].eq 'dob' )
+			.where( o2at[:concept].eq 'sex' )
+			.where( o2at[:raw].in( ['1','2']) )
+			.where( o3at[:concept].eq 'birth_quarter' )
+			.group( o3at[:value], group_birth_year, o2at[:value] )
+			.select( o3at[:value].as('birth_quarter'), birth_year, o2at[:value].as('sex') )
+			.select("COUNT(1) AS count")
+			.order( group_birth_year, o3at[:value], o2at[:raw] )
+	end
+
 end

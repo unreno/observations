@@ -1,0 +1,65 @@
+
+<div id='chart' class='chart'>
+<!-- /the chart goes here -->
+</div>
+
+<table>
+<thead>
+	<tr>
+		<th>Birth Quarter</th>
+		<th>Sex</th>
+		<th>Count</th>
+	</tr>
+</thead>
+<tbody>
+<% @results.each do |result| %>
+	<tr>
+		<td><%= result['birth_quarter'] %>/<%= result['birth_year'] %></td>
+		<td><%= result['sex'] %></td>
+		<td><%= result['count'] %></td>
+	</tr>
+<% end %>
+</tbody>
+</table>
+
+<p><%= @results.to_sql %></p>
+
+
+
+
+<script type="text/javascript">
+//<![CDATA[
+
+var groups = ['Male','Female'];	//	un hardcode this
+var xs = [<%= @results.collect{|r| "\"#{r.birth_year}/#{r.birth_quarter}\"" }.uniq.join(", ").html_safe %>];
+var data = [
+	{
+		x: xs,
+		y: [<%= @results.select{|r|r.sex == 'Male' }.collect(&:count).join(", ").html_safe %>],
+		name: 'Male',
+		type: 'bar'
+	},{
+		x: xs,
+		y: [<%= @results.select{|r|r.sex == 'Female' }.collect(&:count).join(", ").html_safe %>],
+		name: 'Female',
+		type: 'bar'
+	}
+];
+
+var layout = {
+	hovermode: 'closest',
+	barmode: 'group',
+	title: 'Birth Counts per Quarter',
+	xaxis: {
+		title: 'Quarter'
+	},
+	yaxis: {
+		title: 'Births'
+	}
+};
+
+Plotly.newPlot('chart', data, layout);
+
+//]]>
+
+</script>
