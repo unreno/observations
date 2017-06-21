@@ -40,12 +40,20 @@ Plotly.d3.csv('/parallel_coords.csv', function(err, rows){
 				values: unpack(rows, 'delivery_weight')
 			}, {
 				label: 'Mother Weight Change',
-				range: [0,100],
+				range: [-50,150],
 				values: unpack(rows, 'mother_weight_change')
 			}, {
 				label: 'Sex',
 				range: [0,10],
 				values: unpack(rows, 'sex')
+			}, {
+				label: 'Facility Type',
+				range: [1,9],
+				values: unpack(rows, 'facility_type')
+			}, {
+				label: 'Source Pay',
+				range: [1,9],
+				values: unpack(rows, 'source_pay')
 			}, {
 				label: 'Alcohol Use',
 				range: [0,10],

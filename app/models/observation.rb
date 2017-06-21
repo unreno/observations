@@ -342,6 +342,8 @@ class Observation < ApplicationRecord
 		o7at = Observation.arel_table.alias('o7')
 		o8at = Observation.arel_table.alias('o8')
 		o9at = Observation.arel_table.alias('o9')
+		o10at = Observation.arel_table.alias('o10')
+		o11at = Observation.arel_table.alias('o11')
 
 		weight = Arel::Nodes::NamedFunction.new("CAST", [o1at[:value].as("INT")], "birth_weight_grams")
 		age = Arel::Nodes::NamedFunction.new("CAST", [o2at[:value].as("INT")], "mother_age")
@@ -356,6 +358,8 @@ class Observation < ApplicationRecord
 				Arel::Nodes::NamedFunction.new("CAST", [o7at[:value].as("INT")])
 			).as('mother_weight_change')
 		sex = Arel::Nodes::NamedFunction.new("CAST", [o9at[:raw].as("INT")], "sex")
+		facility_type = Arel::Nodes::NamedFunction.new("CAST", [o10at[:raw].as("INT")], "facility_type")
+		source_pay = Arel::Nodes::NamedFunction.new("CAST", [o11at[:raw].as("INT")], "source_pay")
 
 		Observation
 			.joins( outer(o2at, o1at[:chirp_id].eq(o2at[:chirp_id])) )
@@ -366,6 +370,8 @@ class Observation < ApplicationRecord
 			.joins( outer(o7at, o1at[:chirp_id].eq(o7at[:chirp_id])) )
 			.joins( outer(o8at, o1at[:chirp_id].eq(o8at[:chirp_id])) )
 			.joins( outer(o9at, o1at[:chirp_id].eq(o9at[:chirp_id])) )
+			.joins( outer(o10at, o1at[:chirp_id].eq(o10at[:chirp_id])) )
+			.joins( outer(o11at, o1at[:chirp_id].eq(o11at[:chirp_id])) )
 			.where( o1at[:concept].eq 'birth_weight_grams' )
 			.where( o1at[:value].not_eq '8888' )
 			.where( o2at[:concept].eq('b2_mother_age') )
@@ -379,8 +385,10 @@ class Observation < ApplicationRecord
 			.where( o8at[:concept].eq('b2_mother_wt_at_deliv') )
 			.where( o8at[:value].not_eq('999') )
 			.where( o9at[:concept].eq('sex') )
+			.where( o10at[:concept].eq('fac_type_code') )
+			.where( o11at[:concept].eq('b2_source_pay_code') )
 			.select( weight, age, alcohol_use, drug_use, tobacco_use, prenatal_care,
-				pre_preg_weight, delivery_weight, mother_weight_change, sex )
+				pre_preg_weight, delivery_weight, mother_weight_change, sex, facility_type, source_pay )
 #			.limit(10)
 	end
 
