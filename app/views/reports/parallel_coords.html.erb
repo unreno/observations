@@ -31,6 +31,14 @@ var data = [{
 			range: [0,450],
 			values: <%= @results.collect(&:delivery_weight) %>
 		}, {
+			label: 'Mother Weight Change',
+			range: [0,100],
+			values: <%= @results.collect(&:mother_weight_change) %>
+		}, {
+			label: 'Sex',
+			range: [0,10],
+			values: <%= @results.collect(&:sex) %>
+		}, {
 			label: 'Alcohol Use',
 			range: [0,10],
 			values: <%= @results.collect(&:alcohol_use) %>

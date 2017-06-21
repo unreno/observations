@@ -1,0 +1,75 @@
+<div id="graphDiv"></div>
+
+<script type="text/javascript">
+//<![CDATA[
+
+Plotly.d3.csv('/parallel_coords.csv', function(err, rows){
+      
+	function unpack(rows, key) {
+		return rows.map(function(row) { 
+			return row[key]; 
+		});
+	}
+
+	var data = [{
+		type: 'parcoords',
+		line: {
+			showscale: true,
+			reversescale: true,
+			colorscale: 'Jet',
+			cmin: 0,
+			cmax: 6500,
+			color: unpack(rows, 'birth_weight_grams')
+		},
+		dimensions: [
+			{
+				label: 'Birth Weight Grams',
+				range: [0,6500],
+				values: unpack(rows, 'birth_weight_grams')
+			}, {
+				label: 'Mother Age',
+				range: [0,100],
+				values: unpack(rows, 'mother_age')
+			}, {
+				label: 'Pre Preg Weight',
+				range: [0,450],
+				values: unpack(rows, 'pre_preg_weight')
+			}, {
+				label: 'Delivery Weight',
+				range: [0,450],
+				values: unpack(rows, 'delivery_weight')
+			}, {
+				label: 'Mother Weight Change',
+				range: [0,100],
+				values: unpack(rows, 'mother_weight_change')
+			}, {
+				label: 'Sex',
+				range: [0,10],
+				values: unpack(rows, 'sex')
+			}, {
+				label: 'Alcohol Use',
+				range: [0,10],
+				values: unpack(rows, 'alcohol_use')
+			}, {
+				label: 'Drug Use',
+				range: [0,10],
+				values: unpack(rows, 'drug_use')
+			}, {
+				label: 'Tobacco Use',
+				range: [0,10],
+				values: unpack(rows, 'tobacco_use')
+			}, {
+				label: 'Prenatal Care',
+				range: [0,10],
+				values: unpack(rows, 'prenatal_care')
+			}
+		]
+	}];
+	
+	Plotly.plot('graphDiv', data);
+
+});	//	Plotly.d3.csv
+
+//]]>
+
+</script>

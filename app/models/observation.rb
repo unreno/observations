@@ -249,19 +249,19 @@ class Observation < ApplicationRecord
 			.group( o1at[:value], o2at[:value], grouping[:total] )
 			.order( o1at[:value] )
 
-#	SELECT `observations`.`value`, 
-#		COUNT(`observations`.`value`) AS count, 
-#		`o2`.`value` AS UNR:BirthWeightGroup, 
-#		`grouping`.`total` AS group_total 
+#	SELECT `observations`.`value`,
+#		COUNT(`observations`.`value`) AS count,
+#		`o2`.`value` AS UNR:BirthWeightGroup,
+#		`grouping`.`total` AS group_total
 #	FROM (
-#		SELECT `observations`.`value` AS name, COUNT(`observations`.`value`) AS total 
-#		FROM `observations` 
-#		WHERE `observations`.`concept` = 'DEM:Zip' 
+#		SELECT `observations`.`value` AS name, COUNT(`observations`.`value`) AS total
+#		FROM `observations`
+#		WHERE `observations`.`concept` = 'DEM:Zip'
 #		GROUP BY `observations`.`value`
-#	) grouping 
-#	LEFT OUTER JOIN `observations` ON `observations`.`value` = `grouping`.`name` 
-#	LEFT OUTER JOIN `observations` `o2` ON `observations`.`chirp_id` = `o2`.`chirp_id` 
-#	WHERE `observations`.`concept` = 'DEM:Zip' AND `o2`.`concept` = 'UNR:BirthWeightGroup' 
+#	) grouping
+#	LEFT OUTER JOIN `observations` ON `observations`.`value` = `grouping`.`name`
+#	LEFT OUTER JOIN `observations` `o2` ON `observations`.`chirp_id` = `o2`.`chirp_id`
+#	WHERE `observations`.`concept` = 'DEM:Zip' AND `o2`.`concept` = 'UNR:BirthWeightGroup'
 #	GROUP BY `observations`.`value`, `o2`.`value`
 
 	end
@@ -341,6 +341,7 @@ class Observation < ApplicationRecord
 		o6at = Observation.arel_table.alias('o6')
 		o7at = Observation.arel_table.alias('o7')
 		o8at = Observation.arel_table.alias('o8')
+		o9at = Observation.arel_table.alias('o9')
 
 		weight = Arel::Nodes::NamedFunction.new("CAST", [o1at[:value].as("INT")], "birth_weight_grams")
 		age = Arel::Nodes::NamedFunction.new("CAST", [o2at[:value].as("INT")], "mother_age")
@@ -350,6 +351,11 @@ class Observation < ApplicationRecord
 		prenatal_care = Arel::Nodes::NamedFunction.new("CAST", [o6at[:raw].as("INT")], "prenatal_care")
 		pre_preg_weight = Arel::Nodes::NamedFunction.new("CAST", [o7at[:value].as("INT")], "pre_preg_weight")
 		delivery_weight = Arel::Nodes::NamedFunction.new("CAST", [o8at[:value].as("INT")], "delivery_weight")
+		mother_weight_change = Arel::Nodes::Subtraction.new(
+				Arel::Nodes::NamedFunction.new("CAST", [o8at[:value].as("INT")]),
+				Arel::Nodes::NamedFunction.new("CAST", [o7at[:value].as("INT")])
+			).as('mother_weight_change')
+		sex = Arel::Nodes::NamedFunction.new("CAST", [o9at[:raw].as("INT")], "sex")
 
 		Observation
 			.joins( outer(o2at, o1at[:chirp_id].eq(o2at[:chirp_id])) )
@@ -359,6 +365,7 @@ class Observation < ApplicationRecord
 			.joins( outer(o6at, o1at[:chirp_id].eq(o6at[:chirp_id])) )
 			.joins( outer(o7at, o1at[:chirp_id].eq(o7at[:chirp_id])) )
 			.joins( outer(o8at, o1at[:chirp_id].eq(o8at[:chirp_id])) )
+			.joins( outer(o9at, o1at[:chirp_id].eq(o9at[:chirp_id])) )
 			.where( o1at[:concept].eq 'birth_weight_grams' )
 			.where( o1at[:value].not_eq '8888' )
 			.where( o2at[:concept].eq('b2_mother_age') )
@@ -371,7 +378,10 @@ class Observation < ApplicationRecord
 			.where( o7at[:value].not_eq('999') )
 			.where( o8at[:concept].eq('b2_mother_wt_at_deliv') )
 			.where( o8at[:value].not_eq('999') )
-			.select( weight, age, alcohol_use, drug_use, tobacco_use, prenatal_care, pre_preg_weight, delivery_weight )
+			.where( o9at[:concept].eq('sex') )
+			.select( weight, age, alcohol_use, drug_use, tobacco_use, prenatal_care,
+				pre_preg_weight, delivery_weight, mother_weight_change, sex )
+#			.limit(10)
 	end
 
 end
