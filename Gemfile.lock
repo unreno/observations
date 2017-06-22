@@ -71,6 +71,7 @@ GEM
     globalid (0.4.0)
       activesupport (>= 4.2.0)
     i18n (0.8.4)
+    jakewendt-test_with_verbosity (0.0.5)
     jbuilder (2.7.0)
       activesupport (>= 4.2.0)
       multi_json (>= 1.2)
@@ -203,6 +204,7 @@ DEPENDENCIES
   bundler
   byebug
   coffee-rails (~> 4.2)
+  jakewendt-test_with_verbosity
   jbuilder (~> 2.5)
   jquery-rails
   listen (~> 3.0.5)

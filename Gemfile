@@ -78,6 +78,8 @@ group :test do
 
 	gem "autotest-rails", :require => 'autotest/rails'
 
+	gem "jakewendt-test_with_verbosity"
+
 end
 
 gem 'authlogic'
