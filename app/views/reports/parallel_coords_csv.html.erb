@@ -2,6 +2,7 @@
 
 <script type="text/javascript">
 //<![CDATA[
+var nil=null;	//	ruby arrays will return nil when empty. javascript doesn't know what nil is so tell it.
 
 Plotly.d3.csv('/parallel_coords.csv', function(err, rows){
       
@@ -70,6 +71,26 @@ Plotly.d3.csv('/parallel_coords.csv', function(err, rows){
 				label: 'Prenatal Care',
 				range: [0,10],
 				values: unpack(rows, 'prenatal_care')
+			}, {
+				label: 'prepreg_cig',
+				range: [0,100],
+				values: unpack(rows, 'prepreg_cig')
+			}, {
+				label: 'first_cig',
+				range: [0,100],
+				values: unpack(rows, 'first_cig')
+			}, {
+				label: 'sec_cig',
+				range: [0,100],
+				values: unpack(rows, 'sec_cig')
+			}, {
+				label: 'last_cig',
+				range: [0,100],
+				values: unpack(rows, 'last_cig')
+			}, {
+				label: 'Drinks per Week',
+				range: [0,100],
+				values: unpack(rows, 'drinks_per_week')
 			}
 		]
 	}];
