@@ -538,10 +538,10 @@ class Observation < ApplicationRecord
 			.joins( outer(o2at, o1at[:chirp_id].eq(o2at[:chirp_id])
 				.and( o2at[:concept].eq 'sex' ) ))
 			.where( o1at[:concept].eq 'dob' )
-			.group( group_birth_month, group_birth_year, o2at[:raw] )
+			.group( group_birth_month, group_birth_year, o2at[:value] )
 			.select( birth_month, birth_year, o2at[:value].as('sex') )
 			.select("COUNT(1) AS count")
-			.order( group_birth_year, group_birth_month, o2at[:raw] )
+			.order( group_birth_year, group_birth_month, o2at[:value] )
 
 #	this, for some reason, gets passed on to the group call as well.
 #			.select( birth_month.as('birth_month'), birth_year.as('birth_year'), o2at[:value].as('sex') )
@@ -562,10 +562,10 @@ class Observation < ApplicationRecord
 			.joins( outer(o3at, o1at[:chirp_id].eq(o3at[:chirp_id])
 				.and(o3at[:concept].eq('birth_quarter'))) )
 			.where( o1at[:concept].eq 'dob' )
-			.group( o3at[:value], group_birth_year, o2at[:raw] )
+			.group( o3at[:value], group_birth_year, o2at[:value] )
 			.select( o3at[:value].as('birth_quarter'), birth_year, o2at[:value].as('sex') )
 			.select("COUNT(1) AS count")
-			.order( group_birth_year, o3at[:value], o2at[:raw] )
+			.order( group_birth_year, o3at[:value], o2at[:value] )
 	end
 
 end
