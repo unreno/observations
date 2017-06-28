@@ -7,7 +7,7 @@
 <thead>
 	<tr>
 		<th>Birth Month</th>
-		<th>Sex</th>
+		<th>Source Pay</th>
 		<th>Count</th>
 	</tr>
 </thead>
@@ -15,7 +15,7 @@
 <% @results.each do |result| %>
 	<tr>
 		<td><%= result['birth_month'] %>/<%= result['birth_year'] %></td>
-		<td><%= result['sex'] %></td>
+		<td><%= result['source_pay'] %></td>
 		<td><%= result['count'] %></td>
 	</tr>
 <% end %>
@@ -30,32 +30,35 @@
 <script type="text/javascript">
 //<![CDATA[
 
-var groups = ['Male','Female'];	//	un hardcode this
+var groups = [<%= @results.collect{|r| "\"#{r.source_pay}\"" }.uniq.join(", ").html_safe %>];
+
 var xs = [<%= @results.collect{|r| "\"#{r.birth_year}/#{r.birth_month}\"" }.uniq.join(", ").html_safe %>];
-var data = [
-	{
-		x: xs,
-		y: [<%= @results.select{|r|r.sex == 'Male' }.collect(&:count).join(", ").html_safe %>],
-		name: 'Male',
-		type: 'bar'
-	},{
-		x: xs,
-		y: [<%= @results.select{|r|r.sex == 'Female' }.collect(&:count).join(", ").html_safe %>],
-		name: 'Female',
-		type: 'bar'
-	}
-];
+var data = [];
+
+<% @results.collect(&:source_pay).uniq.sort.each_with_index do |source_pay,i| %>
+data[<%=i%>] = {
+	x: xs,
+	y: [<%= @results.select{|r|r.source_pay == source_pay }.collect(&:count).join(", ").html_safe %>],
+	name: "<%=source_pay.html_safe%>",
+	type: 'lines'
+};
+<% end %>
 
 var layout = {
 	hovermode: 'closest',
 	barmode: 'group',
-	title: 'Birth Counts per Month',
-	xaxis: {
+	title: 'Source Pay Birth Counts per Month',
+  xaxis: {
 		title: 'Month'
-	},
-	yaxis: {
-		title: 'Births'
-	}
+  },
+  yaxis: {
+		title: 'Births',
+/*
+    type: 'log',
+    autorange: true
+*/
+  }
+
 };
 
 Plotly.newPlot('chart', data, layout);

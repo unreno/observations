@@ -1,11 +1,15 @@
 class ReportsController < ApplicationController
 
-	def birth_counts_by_quarter
-		@results = Observation.birth_counts_by_quarter
+	def sex_birth_counts_by_quarter
+		@results = Observation.sex_birth_counts_by_quarter
 	end
 
-	def birth_counts_by_month
-		@results = Observation.birth_counts_by_month
+	def sex_birth_counts_by_month
+		@results = Observation.sex_birth_counts_by_month
+	end
+
+	def source_pay_birth_counts_by_month
+		@results = Observation.source_pay_birth_counts_by_month
 	end
 
 	def parallel_coords

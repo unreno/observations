@@ -37,19 +37,19 @@ var data = [
 		x: xs,
 		y: [<%= @results.select{|r|r.sex == 'Male' }.collect(&:count).join(", ").html_safe %>],
 		name: 'Male',
-		type: 'bar'
+		type: 'line'
 	},{
 		x: xs,
 		y: [<%= @results.select{|r|r.sex == 'Female' }.collect(&:count).join(", ").html_safe %>],
 		name: 'Female',
-		type: 'bar'
+		type: 'line'
 	}
 ];
 
 var layout = {
 	hovermode: 'closest',
 	barmode: 'group',
-	title: 'Birth Counts per Quarter',
+	title: 'Sex Birth Counts per Quarter',
 	xaxis: {
 		title: 'Quarter'
 	},
