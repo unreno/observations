@@ -15,7 +15,7 @@ to
 <table style='margin: 0 auto'><thead><tr>
 <th>Concept</th><th>Count</th>
 </thead><tbody>
-<% Observation.select(:concept).group(:concept).count.each do |k,v| %>
+<% Observation.select(:concept).group(:concept).order(:concept).count.each do |k,v| %>
 <tr><td><%=k%></td><td><%=v%></td></tr>
 <% end %>
 </tbody></table>
