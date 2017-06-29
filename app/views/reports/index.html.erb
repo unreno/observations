@@ -1,6 +1,27 @@
 
-<h1>Reports</h1>
+<h1>CHIRP Reports</h1>
 
+<div style='display:table'>
+<div style='display:table-row'>
+<div style='display:table-cell'>
+<p>The CHIRP observations exist for DOBs from 
+<b><%=Observation.where(concept: :dob).select('min(value) as value').first.value.to_date.strftime("%B %e, %Y") %></b>
+to
+<b><%=Observation.where(concept: :dob).select('max(value) as value').first.value.to_date.strftime("%B %e, %Y") %></b>
+.</p>
+</div><!-- style='display:table-cell' -->
+<div style='display:table-cell'>
+<p>The current CHIRP data set includes <b><%=Observation.count%></b> observations with the following non-blank attribute counts.</p>
+<table style='margin: 0 auto'><thead><tr>
+<th>Concept</th><th>Count</th>
+</thead><tbody>
+<% Observation.select(:concept).group(:concept).count.each do |k,v| %>
+<tr><td><%=k%></td><td><%=v%></td></tr>
+<% end %>
+</tbody></table>
+</div><!-- style='display:table-cell' -->
+
+<div style='display:table-cell'>
 <ul>
 	<li><%= link_to "Sex Birth Counts by Quarter", sex_birth_counts_by_quarter_reports_path %></li>
 	<li><%= link_to "Sex Birth Counts by Month", sex_birth_counts_by_month_reports_path %></li>
@@ -44,3 +65,6 @@
 </ul>
 
 <p>Be advised that these queries can be complex and will take a few seconds.</p>
+</div><!-- style='display:table-cell' -->
+</div><!-- style='display:table-row' -->
+</div><!-- style='display:table' -->
