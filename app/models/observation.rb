@@ -525,6 +525,86 @@ class Observation < ApplicationRecord
 #			.limit(100)
 	end
 
+	
+	def self.clustergrammer_matrix
+		o1at = Observation.arel_table	#	don't think that I can alias the initial table
+		o2at = Observation.arel_table.alias('o2')
+		o3at = Observation.arel_table.alias('o3')
+		o4at = Observation.arel_table.alias('o4')
+		o5at = Observation.arel_table.alias('o5')
+		o6at = Observation.arel_table.alias('o6')
+		o7at = Observation.arel_table.alias('o7')
+		o8at = Observation.arel_table.alias('o8')
+		o9at = Observation.arel_table.alias('o9')
+		o10at = Observation.arel_table.alias('o10')
+		o11at = Observation.arel_table.alias('o11')
+		o12at = Observation.arel_table.alias('o12')
+		o13at = Observation.arel_table.alias('o13')
+		o14at = Observation.arel_table.alias('o14')
+		o15at = Observation.arel_table.alias('o15')
+		o16at = Observation.arel_table.alias('o16')
+
+		weight = Arel::Nodes::NamedFunction.new("CAST", [o1at[:value].as("INT")], "birth_weight_grams")
+		age = Arel::Nodes::NamedFunction.new("CAST", [o2at[:value].as("INT")], "mother_age")
+		alcohol_use = Arel::Nodes::NamedFunction.new("CAST", [o3at[:raw].as("INT")], "alcohol_use")
+		drug_use = Arel::Nodes::NamedFunction.new("CAST", [o4at[:raw].as("INT")], "drug_use")
+		tobacco_use = Arel::Nodes::NamedFunction.new("CAST", [o5at[:raw].as("INT")], "tobacco_use")
+		prenatal_care = Arel::Nodes::NamedFunction.new("CAST", [o6at[:raw].as("INT")], "prenatal_care")
+		pre_preg_weight = Arel::Nodes::NamedFunction.new("CAST", [o7at[:value].as("INT")], "pre_preg_weight")
+		delivery_weight = Arel::Nodes::NamedFunction.new("CAST", [o8at[:value].as("INT")], "delivery_weight")
+		mother_weight_change = Arel::Nodes::Subtraction.new(
+				Arel::Nodes::NamedFunction.new("CAST", [o8at[:value].as("INT")]),
+				Arel::Nodes::NamedFunction.new("CAST", [o7at[:value].as("INT")])
+			).as('mother_weight_change')
+		sex = Arel::Nodes::NamedFunction.new("CAST", [o9at[:raw].as("INT")], "sex")
+		facility_type = Arel::Nodes::NamedFunction.new("CAST", [o10at[:raw].as("INT")], "facility_type")
+		source_pay = Arel::Nodes::NamedFunction.new("CAST", [o11at[:raw].as("INT")], "source_pay")
+		prepreg_cig = Arel::Nodes::NamedFunction.new("CAST", [o12at[:value].as("INT")], "prepreg_cig")
+		first_cig = Arel::Nodes::NamedFunction.new("CAST", [o13at[:value].as("INT")], "first_cig")
+		sec_cig = Arel::Nodes::NamedFunction.new("CAST", [o14at[:value].as("INT")], "sec_cig")
+		last_cig = Arel::Nodes::NamedFunction.new("CAST", [o15at[:value].as("INT")], "last_cig")
+		drinks_per_week = Arel::Nodes::NamedFunction.new("CAST", [o16at[:value].as("INT")], "drinks_per_week")
+
+		Observation
+			.joins( outer(o2at, o1at[:chirp_id].eq(o2at[:chirp_id])
+				.and(o2at[:concept].eq('b2_mother_age')).and(o1at[:value].not_eq '8888')) )
+			.joins( outer(o3at, o1at[:chirp_id].eq(o3at[:chirp_id])
+				.and(o3at[:concept].eq('m_alcohol_use'))) )
+			.joins( outer(o4at, o1at[:chirp_id].eq(o4at[:chirp_id])
+				.and(o4at[:concept].eq('m_drug_use'))) )
+			.joins( outer(o5at, o1at[:chirp_id].eq(o5at[:chirp_id])
+				.and(o5at[:concept].eq('b2_tobacco_use'))) )
+			.joins( outer(o6at, o1at[:chirp_id].eq(o6at[:chirp_id])
+				.and(o6at[:concept].eq('b2_prenatal_yesno'))) )
+			.joins( outer(o7at, o1at[:chirp_id].eq(o7at[:chirp_id])
+				.and(o7at[:concept].eq('b2_mother_pre_preg_wt')).and(o7at[:value].not_eq('999'))) )
+			.joins( outer(o8at, o1at[:chirp_id].eq(o8at[:chirp_id])
+				.and(o8at[:concept].eq('b2_mother_wt_at_deliv')).and(o8at[:value].not_eq('999'))) )
+			.joins( outer(o9at, o1at[:chirp_id].eq(o9at[:chirp_id])
+				.and(o9at[:concept].eq('sex'))) )
+			.joins( outer(o10at, o1at[:chirp_id].eq(o10at[:chirp_id])
+				.and(o10at[:concept].eq('fac_type_code'))) )
+			.joins( outer(o11at, o1at[:chirp_id].eq(o11at[:chirp_id])
+				.and(o11at[:concept].eq('b2_source_pay_code') )) )
+			.joins( outer(o12at, o1at[:chirp_id].eq(o12at[:chirp_id])
+				.and(o12at[:concept].eq('b2_mother_cig_prev').and(o12at[:value].not_eq('99')) )) )
+			.joins( outer(o13at, o1at[:chirp_id].eq(o13at[:chirp_id])
+				.and(o13at[:concept].eq('b2_mother_cig_first_tri').and(o13at[:value].not_eq('99')) )) )
+			.joins( outer(o14at, o1at[:chirp_id].eq(o14at[:chirp_id])
+				.and(o14at[:concept].eq('b2_mother_cig_second_tri').and(o14at[:value].not_eq('99')) )) )
+			.joins( outer(o15at, o1at[:chirp_id].eq(o15at[:chirp_id])
+				.and(o15at[:concept].eq('b2_mother_cig_last_tri').and(o15at[:value].not_eq('99')) )) )
+			.joins( outer(o16at, o1at[:chirp_id].eq(o16at[:chirp_id])
+				.and(o16at[:concept].eq('m_alcohol_drink_week').and(o16at[:value].not_eq('99') ))) )
+			.where( o1at[:concept].eq 'birth_weight_grams' )
+			.where( o1at[:value].not_eq '8888' )
+			.select( o1at[:chirp_id], weight, age, alcohol_use, drug_use, tobacco_use, prenatal_care,
+				pre_preg_weight, delivery_weight, mother_weight_change, sex, facility_type, source_pay,
+				prepreg_cig, first_cig, sec_cig, last_cig, drinks_per_week )
+			.order(o1at[:chirp_id])
+#			.limit(100)
+	end
+
 	def self.source_pay_birth_counts_by_month
 		o1at = Observation.arel_table
 		o2at = Observation.arel_table.alias('o2')
