@@ -5,9 +5,9 @@
 <div style='display:table-row'>
 <div style='display:table-cell'>
 <p>The CHIRP observations exist for DOBs from 
-<b><%=Observation.where(concept: :dob).select('min(value) as value').first.value.to_date.strftime("%B %e, %Y") %></b>
+<b><%=Observation.where(concept: :dob).select('MIN(value) AS value')[0].value.to_date.strftime("%B %e, %Y") %></b>
 to
-<b><%=Observation.where(concept: :dob).select('max(value) as value').first.value.to_date.strftime("%B %e, %Y") %></b>
+<b><%=Observation.where(concept: :dob).select('MAX(value) AS value')[0].value.to_date.strftime("%B %e, %Y") %></b>
 .</p>
 </div><!-- style='display:table-cell' -->
 <div style='display:table-cell'>
