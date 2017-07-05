@@ -23,6 +23,12 @@ to
 <b><%= @@distinct_chirp_ids ||= Observation.count('DISTINCT chirp_id')%></b> children born in Washoe County
 .</p>
 
+<p>Be advised, due to a number of reasons, only
+<b><%= @@distinct_webiz_chirp_ids ||= Observation.where(source_schema: :webiz).count('DISTINCT chirp_id')%>
+( <%= (100.0 * @@distinct_webiz_chirp_ids / @@distinct_chirp_ids).round(2) %> )%</b>
+children's birth records have been matched to the WebIZ immunization records
+.</p>
+
 </div><!-- style='display:table-cell' -->
 <div style='display:table-cell'>
 <p>The current CHIRP data set includes <b><%=@@observation_count ||= Observation.count%></b> observations with the following non-blank attribute counts.</p>

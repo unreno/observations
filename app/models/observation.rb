@@ -12,11 +12,13 @@ class Observation < ApplicationRecord
 
 #	NEED TO ADD THE DOB/VAC date comparison. Looks done
 
+#			.outer_join(o4).on(o1[:chirp_id].eq(o4[:chirp_id]))
+#			.where(o4[:concept].eq('vaccination_desc'))
 		inside_select = o1
-			.outer_join(o4).on(o1[:chirp_id].eq(o4[:chirp_id]))
+			.join(o4).on(o1[:chirp_id].eq(o4[:chirp_id])
+				.and(o4[:concept].eq('vaccination_desc')))
 			.where(o1[:concept].eq('dob'))
 			.where(o1[:value].matches('2015%'))
-			.where(o4[:concept].eq('vaccination_desc'))
 			.project(o1[:chirp_id])
 			.project("CAST( observations.value AS DATE ) AS dob")
 			.project(o4[:started_at])
@@ -94,19 +96,23 @@ class Observation < ApplicationRecord
 			.project("'Total Distinct CHIRP IDs' AS vaccination")
 			.project( o1at[:chirp_id].count(:distinct).as('count') )
 
+#			.outer_join( o2at ).on( o1at[:chirp_id].eq(o2at[:chirp_id]) )
+#			.where(o2at[:concept].eq('vaccination_desc'))
 		o2 = o1at
-			.outer_join( o2at ).on( o1at[:chirp_id].eq(o2at[:chirp_id]) )
+			.join( o2at ).on( o1at[:chirp_id].eq(o2at[:chirp_id])
+				.and(o2at[:concept].eq('vaccination_desc')) )
 			.where(o1at[:concept].eq('dob'))
 			.where(o1at[:value].matches('2015%'))
-			.where(o2at[:concept].eq('vaccination_desc'))
 			.project("'CHIRP IDs with WebIZ Match' AS vaccination")
 			.project( o1at[:chirp_id].count(:distinct).as('count') )
 
+#			.outer_join( o2at ).on( o1at[:chirp_id].eq(o2at[:chirp_id]) )
+#			.where(o2at[:concept].eq('vaccination_desc'))
 		o3 = o1at
-			.outer_join( o2at ).on( o1at[:chirp_id].eq(o2at[:chirp_id]) )
+			.join( o2at ).on( o1at[:chirp_id].eq(o2at[:chirp_id])
+				.and(o2at[:concept].eq('vaccination_desc')) )
 			.where(o1at[:concept].eq('dob'))
 			.where(o1at[:value].matches('2015%'))
-			.where(o2at[:concept].eq('vaccination_desc'))
 			.project(o2at[:value].as('vaccination'))
 			.project(o2at[:chirp_id].count(:distinct).as('count') )
 			.group(o2at[:value])
@@ -135,8 +141,14 @@ class Observation < ApplicationRecord
 		year_vac = Arel::Nodes::NamedFunction.new("YEAR", [o3at[:started_at]], "year")
 		month_vac = Arel::Nodes::NamedFunction.new("MONTH", [o3at[:started_at]], "month")
 
+#	This will include records without webiz records
+#			.joins( outer(o3at, o1at[:chirp_id].eq(o3at[:chirp_id])
+#				.and(o3at[:concept].eq('vaccination_desc'))) )
+#
+#			.joins( outer(o3at, o1at[:chirp_id].eq(o3at[:chirp_id])))
+#			.where( o3at[:concept].eq('vaccination_desc') )
 		results = Observation
-			.joins( outer(o3at, o1at[:chirp_id].eq(o3at[:chirp_id])
+			.joins( inner(o3at, o1at[:chirp_id].eq(o3at[:chirp_id])
 				.and(o3at[:concept].eq('vaccination_desc'))) )
 			.where( o1at[:concept].eq('dob') )
 			.where( o1at[:value].matches('2015%') )
