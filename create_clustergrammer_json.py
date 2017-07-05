@@ -4,6 +4,15 @@ net = Network()
 net.load_file('mult_view.tsv')
 
 
+
+
+# Z-score normalize the rows
+#net.normalize(axis='row', norm_type='zscore', keep_orig=True)
+
+
+
+
+
 # calculate clustering using default parameters
 net.cluster()
 
