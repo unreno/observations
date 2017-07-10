@@ -38,7 +38,7 @@
 
 
 
-filename="Observations-20170629.tsv"
+filename="Observations-20170710.tsv"
 
 
 if ActiveRecord::Base.connection_config[:adapter] == 'sqlserver'
