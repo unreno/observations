@@ -8,34 +8,34 @@
 <p>The CHIRP observations exist ...</p>
 
 <p>... for DOBs from 
-<b><%= @@earliest_dob ||= Observation.where(concept: :dob).select('MIN(value) AS value')[0].value.to_date.strftime("%B %e, %Y") %></b>
+<b><%= $earliest_dob.strftime("%B %e, %Y") %></b>
 to
-<b><%= @@latest_dob ||= Observation.where(concept: :dob).select('MAX(value) AS value')[0].value.to_date.strftime("%B %e, %Y") %></b>
+<b><%= $latest_dob.strftime("%B %e, %Y") %></b>
 .</p>
 
 <p>... for immunizations from 
-<b><%= @@earliest_imm ||= Observation.where(source_table: :immunizations).select('MIN(started_at) AS value')[0].value.to_date.strftime("%B %e, %Y") %></b>
+<b><%= $earliest_imm.strftime("%B %e, %Y") %></b>
 to
-<b><%= @@latest_imm ||= Observation.where(source_table: :immunizations).select('MAX(started_at) AS value')[0].value.to_date.strftime("%B %e, %Y") %></b>
+<b><%= $latest_imm.strftime("%B %e, %Y") %></b>
 .</p>
 
 <p>... for 
-<b><%= @@distinct_chirp_ids ||= Observation.count('DISTINCT chirp_id')%></b> children born in Washoe County
+<b><%= $distinct_chirp_ids %></b> children born in Washoe County
 .</p>
 
 <p>Be advised, due to a number of reasons, only
-<b><%= @@distinct_webiz_chirp_ids ||= Observation.where(source_schema: :webiz).count('DISTINCT chirp_id')%>
-( <%= (100.0 * @@distinct_webiz_chirp_ids / @@distinct_chirp_ids).round(2) %> )%</b>
+<b><%= $distinct_webiz_chirp_ids %>
+( <%= (100.0 * $distinct_webiz_chirp_ids / $distinct_chirp_ids).round(2) %> )%</b>
 children's birth records have been matched to the WebIZ immunization records
 .</p>
 
 </div><!-- style='display:table-cell' -->
 <div style='display:table-cell; width: 350px;'>
-<p>The current CHIRP data set includes <b><%=@@observation_count ||= Observation.count%></b> observations with the following non-blank attribute counts.</p>
+<p>The current CHIRP data set includes <b><%=$observation_count %></b> observations with the following non-blank attribute counts.</p>
 <table style='margin: 0 auto'><thead><tr>
 <th>Concept</th><th>Count</th>
 </thead><tbody>
-<% (@@attributes_counts ||= Observation.select(:concept).group(:concept).order(:concept).count).each do |k,v| %>
+<% $attributes_counts.each do |k,v| %>
 <tr><td><%=k%></td><td><%=v%></td></tr>
 <% end %>
 </tbody></table>
@@ -44,9 +44,13 @@ children's birth records have been matched to the WebIZ immunization records
 <div style='display:table-cell'>
 <p>Some sample reports.</p>
 <ul>
-	<li><%= link_to "Sex Birth Counts by Quarter", sex_birth_counts_by_quarter_reports_path %></li>
-	<li><%= link_to "Sex Birth Counts by Month", sex_birth_counts_by_month_reports_path %></li>
-	<li><%= link_to "Source Pay Birth Counts by Month", source_pay_birth_counts_by_month_reports_path %></li>
+	<li><%= link_to "Sex Birth Counts by Quarter/Year", sex_birth_counts_by_quarter_year_reports_path %></li>
+	<li><%= link_to "Sex Birth Counts by Month/Year", sex_birth_counts_by_month_year_reports_path %></li>
+	<li><%= link_to "Birth Counts by Quarter/Year", birth_counts_by_quarter_year_reports_path %></li>
+	<li><%= link_to "Birth Counts by Quarter", birth_counts_by_quarter_reports_path %></li>
+	<li><%= link_to "Birth Counts by Month/Year", birth_counts_by_month_year_reports_path %></li>
+	<li><%= link_to "Birth Counts by Month", birth_counts_by_month_reports_path %></li>
+	<li><%= link_to "Source Pay Birth Counts by Month/Year", source_pay_birth_counts_by_month_year_reports_path %></li>
 <!-- Real data contains non-numeric raw values which won't CAST to INT in SQL Server
 	<li><%= link_to "Parallel Coord", parallel_coords_reports_path %></li>
 -->

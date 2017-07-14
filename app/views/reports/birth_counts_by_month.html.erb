@@ -1,0 +1,56 @@
+?
+<div id='chart' class='chart'>
+<!-- /the chart goes here -->
+</div>
+
+<table>
+<thead>
+	<tr>
+		<th>Birth Month</th>
+		<th>Count</th>
+	</tr>
+</thead>
+<tbody>
+<% @results.each do |result| %>
+	<tr>
+		<td><%= result['birth_month'] %></td>
+		<td><%= result['count'] %></td>
+	</tr>
+<% end %>
+</tbody>
+</table>
+
+<p><%= @results.to_sql %></p>
+
+
+
+
+<script type="text/javascript">
+//<![CDATA[
+
+var xs = [<%= @results.collect{|r| "\"#{r.birth_month}\"" }.uniq.join(", ").html_safe %>];
+var data = [
+	{
+		x: xs,
+		y: [<%= @results.collect(&:count).join(", ").html_safe %>],
+		name: '?Male',
+		type: 'line'
+	}
+];
+
+var layout = {
+	hovermode: 'closest',
+	title: 'Birth Counts per Month',
+	xaxis: {
+		title: 'Month'
+	},
+	yaxis: {
+		title: 'Births'
+	}
+};
+
+Plotly.newPlot('chart', data, layout);
+
+//]]>
+
+</script>

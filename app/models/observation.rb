@@ -32,7 +32,7 @@ class Observation < ApplicationRecord
 		#	Still take 47 seconds in sql server while mysql only takes 8???
 		#	I don't understand it, but CASTing dob to a DATE makes this faster?
 		#	I wouldn't have expected casting the field into another variable would affect the field?
-		inside_select = if ActiveRecord::Base.connection_config[:adapter] == 'sqlserver'
+		inside_select = if ActiveRecord::Base.connection_config[:adapter] == 'qlserver'
 			inside_select.where(Arel.sql("[o4].[started_at] < DATEADD(month, 7, [observations].[value])"))
 #			inside_select.project(Arel.sql("DATEADD(month, 7, [observations].[value]) AS dob7"))
 		elsif ActiveRecord::Base.connection_config[:adapter] == 'mysql2'
@@ -617,7 +617,7 @@ class Observation < ApplicationRecord
 #			.limit(100)
 	end
 
-	def self.source_pay_birth_counts_by_month
+	def self.source_pay_birth_counts_by_month_year
 		o1at = Observation.arel_table
 		o2at = Observation.arel_table.alias('o2')
 
@@ -640,7 +640,73 @@ class Observation < ApplicationRecord
 #	need an alias so can get them so need to create 2 named functions for each.
 	end
 
-	def self.sex_birth_counts_by_month
+	def self.birth_counts_by_quarter
+		o1at = Observation.arel_table
+
+		Observation
+			.where( o1at[:concept].eq 'birth_quarter' )
+			.group( o1at[:value] )
+			.select( o1at[:value].as('birth_quarter') )
+			.select("COUNT(1) AS count")
+			.order( o1at[:value] )
+	end
+
+	def self.birth_counts_by_quarter_year
+		o1at = Observation.arel_table
+		o3at = Observation.arel_table.alias('o3')
+
+		birth_year = Arel::Nodes::NamedFunction.new("YEAR", [o1at[:value]], 'birth_year')
+		group_birth_year = Arel::Nodes::NamedFunction.new("YEAR", [o1at[:value]])
+#		birth_quarter = Arel::Nodes::NamedFunction.new("DATEPART", ["q",o1at[:value]],'birth_quarter')
+#		group_birth_quarter = Arel::Nodes::NamedFunction.new("DATEPART", ["q",o1at[:value]])
+
+		Observation
+			.joins( outer(o3at, o1at[:chirp_id].eq(o3at[:chirp_id])
+				.and(o3at[:concept].eq('birth_quarter'))) )
+			.where( o1at[:concept].eq 'dob' )
+			.group( o3at[:value], group_birth_year )
+			.select( o3at[:value].as('birth_quarter'), birth_year )
+			.select("COUNT(1) AS count")
+			.order( group_birth_year, o3at[:value] )
+#		Observation
+#			.where( o1at[:concept].eq 'dob' )
+#			.group( "DATEPART(Q,`observations`.`value`)", group_birth_year )
+#			.select( "DATEPART(Q,`observations`.`value`) AS birth_quarter", birth_year )
+#			.select("COUNT(1) AS count")
+#			.order( group_birth_year, "DATEPART(Q,`observations`.`value`)" )
+	end
+
+	def self.birth_counts_by_month
+		o1at = Observation.arel_table
+
+		birth_month = Arel::Nodes::NamedFunction.new("MONTH", [o1at[:value]], 'birth_month')
+		group_birth_month = Arel::Nodes::NamedFunction.new("MONTH", [o1at[:value]])
+
+		Observation
+			.where( o1at[:concept].eq 'dob' )
+			.group( group_birth_month )
+			.select( birth_month )
+			.select("COUNT(1) AS count")
+			.order( group_birth_month )
+	end
+
+	def self.birth_counts_by_month_year
+		o1at = Observation.arel_table
+
+		birth_month = Arel::Nodes::NamedFunction.new("MONTH", [o1at[:value]], 'birth_month')
+		birth_year = Arel::Nodes::NamedFunction.new("YEAR", [o1at[:value]], 'birth_year')
+		group_birth_month = Arel::Nodes::NamedFunction.new("MONTH", [o1at[:value]])
+		group_birth_year = Arel::Nodes::NamedFunction.new("YEAR", [o1at[:value]])
+
+		Observation
+			.where( o1at[:concept].eq 'dob' )
+			.group( group_birth_month, group_birth_year )
+			.select( birth_month, birth_year )
+			.select("COUNT(1) AS count")
+			.order( group_birth_year, group_birth_month )
+	end
+
+	def self.sex_birth_counts_by_month_year
 		o1at = Observation.arel_table
 		o2at = Observation.arel_table.alias('o2')
 
@@ -663,7 +729,7 @@ class Observation < ApplicationRecord
 #	need an alias so can get them so need to create 2 named functions for each.
 	end
 
-	def self.sex_birth_counts_by_quarter
+	def self.sex_birth_counts_by_quarter_year
 		o1at = Observation.arel_table
 		o2at = Observation.arel_table.alias('o2')
 		o3at = Observation.arel_table.alias('o3')

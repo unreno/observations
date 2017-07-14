@@ -1,15 +1,42 @@
 class ReportsController < ApplicationController
 
-	def sex_birth_counts_by_quarter
-		@results = Observation.sex_birth_counts_by_quarter
+	def index
+		$earliest_dob ||= ( Observation.where(concept: :dob).select('MIN(value) AS value')[0].value.try(:to_date) || Time.now )
+		$latest_dob ||= ( Observation.where(concept: :dob).select('MAX(value) AS value')[0].value.try(:to_date) || Time.now )
+		$earliest_imm ||= ( Observation.where(source_table: :immunizations).select('MIN(started_at) AS value')[0].value.try(:to_date) || Time.now )
+		$latest_imm ||= ( Observation.where(source_table: :immunizations).select('MAX(started_at) AS value')[0].value.try(:to_date) || Time.now )
+		$distinct_chirp_ids ||= Observation.count('DISTINCT chirp_id')
+		$distinct_webiz_chirp_ids ||= Observation.where(source_schema: :webiz).count('DISTINCT chirp_id')
+		$observation_count ||= Observation.count
+		$attributes_counts ||= Observation.select(:concept).group(:concept).order(:concept).count
 	end
 
-	def sex_birth_counts_by_month
-		@results = Observation.sex_birth_counts_by_month
+	def sex_birth_counts_by_quarter_year
+		@results = Observation.sex_birth_counts_by_quarter_year
 	end
 
-	def source_pay_birth_counts_by_month
-		@results = Observation.source_pay_birth_counts_by_month
+	def sex_birth_counts_by_month_year
+		@results = Observation.sex_birth_counts_by_month_year
+	end
+
+	def birth_counts_by_quarter_year
+		@results = Observation.birth_counts_by_quarter_year
+	end
+
+	def birth_counts_by_quarter
+		@results = Observation.birth_counts_by_quarter
+	end
+
+	def birth_counts_by_month_year
+		@results = Observation.birth_counts_by_month_year
+	end
+
+	def birth_counts_by_month
+		@results = Observation.birth_counts_by_month
+	end
+
+	def source_pay_birth_counts_by_month_year
+		@results = Observation.source_pay_birth_counts_by_month_year
 	end
 
 	def parallel_coords

@@ -1,0 +1,55 @@
+
+<div id='chart' class='chart'>
+<!-- /the chart goes here -->
+</div>
+
+<table>
+<thead>
+	<tr>
+		<th>Birth Quarter</th>
+		<th>Count</th>
+	</tr>
+</thead>
+<tbody>
+<% @results.each do |result| %>
+	<tr>
+		<td><%= result['birth_quarter'] %>/<%= result['birth_year'] %></td>
+		<td><%= result['count'] %></td>
+	</tr>
+<% end %>
+</tbody>
+</table>
+
+<p><%= @results.to_sql %></p>
+
+
+
+
+<script type="text/javascript">
+//<![CDATA[
+
+var xs = [<%= @results.collect{|r| "\"#{r.birth_year}/#{r.birth_quarter}\"" }.uniq.join(", ").html_safe %>];
+var data = [
+	{
+		x: xs,
+		y: [<%= @results.collect(&:count).join(", ").html_safe %>],
+		type: 'line'
+	}
+];
+
+var layout = {
+	hovermode: 'closest',
+	title: 'Birth Counts per Quarter/Year',
+	xaxis: {
+		title: 'Quarter'
+	},
+	yaxis: {
+		title: 'Births'
+	}
+};
+
+Plotly.newPlot('chart', data, layout);
+
+//]]>
+
+</script>

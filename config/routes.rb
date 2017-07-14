@@ -2,9 +2,13 @@ Rails.application.routes.draw do
 
 	resources :reports, only: :index do
 		collection do
-			get :sex_birth_counts_by_quarter
-			get :sex_birth_counts_by_month
-			get :source_pay_birth_counts_by_month
+			get :sex_birth_counts_by_quarter_year
+			get :sex_birth_counts_by_month_year
+			get :birth_counts_by_quarter_year
+			get :birth_counts_by_quarter
+			get :birth_counts_by_month_year
+			get :birth_counts_by_month
+			get :source_pay_birth_counts_by_month_year
 			get :parallel_coords
 			get :parallel_coords_csv
 			get :completed_immunizations
