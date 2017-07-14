@@ -85,6 +85,6 @@ end
 gem 'authlogic'
 gem 'rails-controller-testing'
 
-gem 'tiny_tds'
+gem 'tiny_tds', '~> 1'
 gem 'activerecord-sqlserver-adapter'
 
