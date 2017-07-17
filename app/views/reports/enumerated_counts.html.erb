@@ -1,0 +1,19 @@
+<h1 style='text-align: center'>Enumerated Counts</h1>
+
+<table style='margin: 0 auto'><thead><tr>
+	<th>Concept</th>
+	<th>Value</th>
+	<th>Count</th>
+</tr></thead><tbody>
+<% @results.each do |key,counts| %>
+		<% counts.each_with_index do |value_and_count,i| %>
+<% if i == 0 %>
+	<tr>
+		<td rowspan="<%=counts.length%>"><%=key%></td>
+<% end %>
+			<td><%=value_and_count[0]%></td>
+			<td><%=value_and_count[1]%></td>
+	</tr>
+		<% end %>
+<% end %>
+</tbody></table>

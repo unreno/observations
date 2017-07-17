@@ -2,6 +2,7 @@ Rails.application.routes.draw do
 
 	resources :reports, only: :index do
 		collection do
+			get :enumerated_counts
 			get :sex_birth_counts_by_quarter_year
 			get :sex_birth_counts_by_month_year
 			get :birth_counts_by_quarter_year

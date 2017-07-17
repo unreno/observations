@@ -11,6 +11,10 @@ class ReportsController < ApplicationController
 		$attributes_counts ||= Observation.select(:concept).group(:concept).order(:concept).count
 	end
 
+	def enumerated_counts
+		@results = Observation.enumerated_counts
+	end
+
 	def sex_birth_counts_by_quarter_year
 		@results = Observation.sex_birth_counts_by_quarter_year
 	end
