@@ -51,6 +51,16 @@ class ReportsController < ApplicationController
 		@results = Observation.ave_birth_weight_to_zip
 	end
 
+	def birth_res_zip_code_percents
+#		@concepts = %w{ sex b2_prenatal_yesno m_alcohol_use m_drug_use }
+		@concepts = Observation::ENUMERATED_CONCEPTS
+		if params[:v].present?
+			@value = params[:v]
+			@query = Observation.birth_res_zip_code_percents( @value )
+			@results = ActiveRecord::Base.connection.select_all( @query )
+		end
+	end
+
 	def birth_weight_group_to_percent_of
 		@value = params[:v] || 'DEM:Zip'
 		@query = Observation.birth_weight_group_percents_to( @value )

@@ -18,6 +18,7 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
 		birth_weight_to_mom_age_reports
 		birth_weight_to_tot_cigs_reports
 		birth_weight_group_to_percent_of_reports
+		birth_res_zip_code_percents_reports
 		ave_birth_weight_to_zip_reports
 	}.each do |route|
 

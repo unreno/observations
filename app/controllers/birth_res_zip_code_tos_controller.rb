@@ -1,7 +1,8 @@
 class BirthResZipCodeTosController < ApplicationController
 
 	def show
-		@concepts = %w{ b2_prenatal_yesno m_alcohol_use m_drug_use }
+#		@concepts = %w{ b2_prenatal_yesno m_alcohol_use m_drug_use }
+		@concepts = Observation::ENUMERATED_CONCEPTS
 		if params[:v].present?
 			@value = case params[:v]
 				when 'b2_prenatal_yesno' then 'Prenatal Care'

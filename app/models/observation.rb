@@ -287,6 +287,39 @@ class Observation < ApplicationRecord
 			.select( o1at[:chirp_id].count(:distinct).as('count') )
 	end
 
+	def self.birth_res_zip_code_percents( field, as = nil )
+		o1at = Observation.arel_table	#	don't think that I can alias the initial table
+		o2at = o1at.alias('o2')
+
+		grouping_table_name = 'grouping'
+
+		grouping_sql = o1at
+			.project( o1at[:value].as 'name' )
+			.project( o1at[:value].count.as 'total' )
+			.where( o1at[:concept].eq 'birth_zip' )
+			.where( o1at[:source_table].eq 'births' )
+			.group( o1at[:value] )
+			.as( grouping_table_name )
+
+		#	same name as in .as(...) above (to be used when selecting or whereing)
+		grouping = Arel::Table.new( grouping_table_name )
+
+		#	select before join, project after join (same thing)
+		outside_select = Observation.from(grouping_sql.to_sql)
+			.select( o2at[:value].as 'value' )
+			.select( o1at[:value].count.as 'count' )
+			.select( o1at[:value].as 'birth_res_zip_code')
+			.select( grouping[:total].as 'total' )
+			.outer_join( o1at ).on( o1at[:value].eq( grouping[:name]))
+			.where( o1at[:concept].eq 'birth_zip' )
+			.where( o1at[:source_table].eq 'births' )
+			.outer_join( o2at ).on( o1at[:chirp_id].eq( o2at[:chirp_id]))
+			.where( o2at[:concept].eq field )
+			.group( o1at[:value], o2at[:value], grouping[:total] )
+			.order( o1at[:value] )
+
+	end
+
 	def self.birth_res_zip_code_to( field, as = nil )
 		o1at = Observation.arel_table	#	don't think that I can alias the initial table
 		o2at = Observation.arel_table.alias('o2')
@@ -767,8 +800,19 @@ class Observation < ApplicationRecord
 		o1at = Observation.arel_table
 
 		Observation
-			.where( o1at[:concept].in( %w{
-				apgar_10
+			.where( o1at[:concept].in( Observation::ENUMERATED_CONCEPTS ) )
+			.group( o1at[:concept], o1at[:value] ).count
+			.inject({}){|h,v| h[v[0][0]]||={};h[v[0][0]][v[0][1]] = v[1];h }
+
+#irb(main):016:0> o.select{|k,v|k[0]=="m_ol_prolong_labor"}
+#=> {["m_ol_prolong_labor", "No"]=>37128, ["m_ol_prolong_labor", "Yes"]=>854}
+
+#o.inject({}){|h,v| h[v[0][0]]||={};h[v[0][0]][v[0][1]] = v[1];h }["m_ol_prolong_labor"]
+#=> {"No"=>37128, "Yes"=>854}
+
+	end
+
+	ENUMERATED_CONCEPTS = %w{				apgar_10
 				apgar_5
 				attendant_title_code
 				b2_birpresent_code
@@ -895,7 +939,6 @@ class Observation < ApplicationRecord
 				fbir_state_fips_alpha_cd
 				fbir_state_state_code_nv
 				gestation_weeks
-				isactive
 				live_births_dead
 				live_births_living
 				live_births_total
@@ -1065,16 +1108,6 @@ class Observation < ApplicationRecord
 				ssn_requested
 				term_number
 				trans_infant
-			} ) )
-			.group( o1at[:concept], o1at[:value] ).count
-			.inject({}){|h,v| h[v[0][0]]||={};h[v[0][0]][v[0][1]] = v[1];h }
-
-#irb(main):016:0> o.select{|k,v|k[0]=="m_ol_prolong_labor"}
-#=> {["m_ol_prolong_labor", "No"]=>37128, ["m_ol_prolong_labor", "Yes"]=>854}
-
-#o.inject({}){|h,v| h[v[0][0]]||={};h[v[0][0]][v[0][1]] = v[1];h }["m_ol_prolong_labor"]
-#=> {"No"=>37128, "Yes"=>854}
-
-	end
+	}
 
 end

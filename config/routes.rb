@@ -18,6 +18,7 @@ Rails.application.routes.draw do
 			get :birth_weight_to_mom_age
 			get :birth_weight_to_tot_cigs
 			get :birth_weight_group_to_percent_of
+			get :birth_res_zip_code_percents
 			get :ave_birth_weight_to_zip
 #			get :birth_weight_group_to_alcohol_use
 #			get :birth_weight_group_to_drug_use
