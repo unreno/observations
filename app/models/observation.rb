@@ -332,6 +332,7 @@ class Observation < ApplicationRecord
 			.group( o1at[:value], o2at[:value] )
 			.select( o1at[:value].as('birth_res_zip_code'), o2at[:value] )
 			.select( o1at[:chirp_id].count(:distinct).as('count') )
+			.order( o1at[:value], o2at[:value] )
 	end
 
 	def self.birth_xy( x, y )
