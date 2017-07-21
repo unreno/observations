@@ -3,7 +3,7 @@
 <%= form_tag request.path, method: :get do %>
 	<p><%= select_tag 'v', options_for_select(@concepts, params[:v]), 
 		:prompt => '- Select Concept -' %>
-	<%= submit_tag "Filter", :name => nil %></p>
+	<%= submit_tag "Query", :name => nil %></p>
 <% end %>
 
 
