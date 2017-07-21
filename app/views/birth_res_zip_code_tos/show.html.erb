@@ -1,0 +1,78 @@
+<p>Grouped bar chart of Birth Res Zip Code to ...</p>
+
+<%= form_tag request.path, method: :get do %>
+	<p><%= select_tag 'v', options_for_select(@concepts, params[:v]), 
+		:prompt => '- Select Concept -' %>
+	<%= submit_tag "Filter", :name => nil %></p>
+<% end %>
+
+
+<% if @value.present? %>
+<div id='chart' class='chart'>
+<!-- /the chart goes here -->
+</div>
+
+<table>
+<thead>
+	<tr>
+		<th>Zip Code</th>
+		<th><%=@value%></th>
+		<th>Count</th>
+	</tr>
+</thead>
+<tbody>
+<% @results.each do |result| %>
+	<tr>
+		<td><%= result['birth_res_zip_code'] %></td>
+		<td><%= result['value'] %></td>
+		<td><%= result['count'] %></td>
+	</tr>
+<% end %>
+</tbody>
+</table>
+
+<p><%= @results.to_sql %></p>
+
+
+
+
+<script type="text/javascript">
+//<![CDATA[
+
+// x's should be zip codes.
+var xs = [<%=@results.collect{|r| "\"#{r.birth_res_zip_code}\"" }.uniq.join(", ").html_safe %>];
+var data = [];
+
+//	y's should be the values for the given concept.
+<% @results.collect{|r| r['value'] }.uniq.sort.each_with_index do |value,i| %>
+data[<%=i%>] = {
+	x: xs,
+	y: [<%= 
+		@results.collect{|r| r.birth_res_zip_code }.uniq.collect{|birth_res_zip_code|
+			@results.find{|r| r['birth_res_zip_code'] == birth_res_zip_code and r['value'] == value }.try(:count)||0 
+		}.join(", ").html_safe 
+%>],
+	name: '<%=value.html_safe%>',
+	type: 'bar'
+};
+<% end.join("\n")	#	@results %>
+
+var layout = {
+	hovermode: 'closest',
+	barmode: 'group',
+	title: "Zip Code to <%=@value.html_safe%>",
+	xaxis: {
+		type: 'category',	//	zip codes being treated as numbers.
+		title: 'Zip Code'
+	},
+	yaxis: {
+		title: 'Count'
+	}
+};
+
+Plotly.newPlot('chart', data, layout);
+
+//]]>
+
+</script>
+<% end	#	if @value.present? %>
