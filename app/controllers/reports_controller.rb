@@ -12,7 +12,9 @@ class ReportsController < ApplicationController
 	end
 
 	def enumerated_counts
-		@results = Observation.enumerated_counts
+		@query = Observation.enumerated_counts
+		@results = @query.count
+			.inject({}){|h,v| h[v[0][0]]||={};h[v[0][0]][v[0][1]] = v[1];h }
 	end
 
 	def sex_birth_counts_by_quarter_year

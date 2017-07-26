@@ -804,8 +804,9 @@ class Observation < ApplicationRecord
 			.where( o1at[:concept].in( Observation::ENUMERATED_CONCEPTS ) )
 			.group( o1at[:concept], o1at[:value] )
 			.order( o1at[:concept], o1at[:value] )
-			.count
-			.inject({}){|h,v| h[v[0][0]]||={};h[v[0][0]][v[0][1]] = v[1];h }
+
+#			.count
+#			.inject({}){|h,v| h[v[0][0]]||={};h[v[0][0]][v[0][1]] = v[1];h }
 
 #irb(main):016:0> o.select{|k,v|k[0]=="m_ol_prolong_labor"}
 #=> {["m_ol_prolong_labor", "No"]=>37128, ["m_ol_prolong_labor", "Yes"]=>854}
