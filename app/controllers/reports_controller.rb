@@ -64,7 +64,7 @@ class ReportsController < ApplicationController
 	end
 
 	def birth_weight_group_to_percent_of
-		@value = params[:v] || 'DEM:Zip'
+		@value = params[:v] || 'birth_zip'	#'DEM:Zip'
 		@query = Observation.birth_weight_group_percents_to( @value )
 		@results = ActiveRecord::Base.connection.select_all( @query )
 	end

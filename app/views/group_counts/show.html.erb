@@ -1,0 +1,79 @@
+<%= form_tag request.path, method: :get do %>
+	<p>Concept value counts of 
+	<%= select_tag 'concept', options_for_select(@concepts, params[:concept]), 
+		:prompt => '- Select Concept -' %>
+	grouped by 
+	<%= select_tag 'group', options_for_select(@concepts, params[:group]), 
+		:prompt => '- Select Group -' %>
+values. <%= submit_tag "Query", :name => nil %></p>
+<% end %>
+
+
+<% if params[:concept].present? %>
+<div id='chart' class='chart'>
+<!-- /the chart goes here -->
+</div>
+
+<table>
+<thead>
+	<tr>
+		<th><%= params[:group] %></th>
+		<th><%= params[:concept] %></th>
+		<th>Count</th>
+	</tr>
+</thead>
+<tbody>
+<% @results.each do |result| %>
+	<tr>
+		<td><%= result['group_field'] %></td>
+		<td><%= result['count_field'] %></td>
+		<td><%= result['count'] %></td>
+	</tr>
+<% end %>
+</tbody>
+</table>
+
+<p><%= @results.to_sql %></p>
+
+
+
+
+<script type="text/javascript">
+//<![CDATA[
+
+//	x's are the values
+var xs = [<%=@results.collect{|r| "\"#{r.count_field}\"" }.uniq.join(", ").html_safe %>];
+var data = [];
+
+//	y's should be the counts for the given concept for each zip code. ie. [Yes, No, Unknown]
+<% @results.collect{|r| r.group_field }.uniq.each_with_index do |group,i| %>
+data[<%=i%>] = {
+	x: xs,
+	y: [<%= 
+		@results.collect{|r| r.count_field }.uniq.collect{|value|
+			@results.find{|r| r.group_field == group and r.count_field == value }.try(:count)||0 
+		}.join(", ").html_safe 
+%>],
+	name: '<%=group.html_safe%>',
+	type: 'bar'
+};
+<% end.join("\n")	#	@results %>
+
+var layout = {
+	hovermode: 'closest',
+	barmode: 'group',
+	title: "Counts of <%= params[:concept].html_safe%> values grouped by <%= params[:group].html_safe %>",
+	xaxis: {
+		title: '<%= params[:concept].html_safe%> Values'
+	},
+	yaxis: {
+		title: 'Count'
+	}
+};
+
+Plotly.newPlot('chart', data, layout);
+
+//]]>
+
+</script>
+<% end	#	if @value.present? %>

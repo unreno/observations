@@ -273,19 +273,33 @@ class Observation < ApplicationRecord
 
 	end
 
-	def self.birth_weight_group_to( field, as = nil )
+	def self.group_counts( field, group )
 		o1at = Observation.arel_table	#	don't think that I can alias the initial table
 		o2at = Observation.arel_table.alias('o2')
 
 		Observation
 			.joins( outer(o2at, o1at[:chirp_id].eq(o2at[:chirp_id])
-				.and( o2at[:concept].eq field ).and( o2at[:source_table].eq 'births' )))
-			.where( o1at[:concept].eq 'birth_weight_group')
-			.where( o1at[:source_table].eq 'births' )
+				.and( o2at[:concept].eq field ) ) )
+			.where( o1at[:concept].eq group )
 			.group( o1at[:value], o2at[:value] )
-			.select( o1at[:value].as('birth_weight_group'), o2at[:value] )
+			.select( o1at[:value].as('group_field'), o2at[:value].as('count_field') )
 			.select( o1at[:chirp_id].count(:distinct).as('count') )
+			.order( o1at[:value], o2at[:value] )
 	end
+
+#	def self.birth_weight_group_to( field, as = nil )
+#		o1at = Observation.arel_table	#	don't think that I can alias the initial table
+#		o2at = Observation.arel_table.alias('o2')
+#
+#		Observation
+#			.joins( outer(o2at, o1at[:chirp_id].eq(o2at[:chirp_id])
+#				.and( o2at[:concept].eq field ).and( o2at[:source_table].eq 'births' )))
+#			.where( o1at[:concept].eq 'birth_weight_group')
+#			.where( o1at[:source_table].eq 'births' )
+#			.group( o1at[:value], o2at[:value] )
+#			.select( o1at[:value].as('birth_weight_group'), o2at[:value] )
+#			.select( o1at[:chirp_id].count(:distinct).as('count') )
+#	end
 
 	def self.birth_res_zip_code_percents( field, as = nil )
 		o1at = Observation.arel_table	#	don't think that I can alias the initial table
@@ -320,20 +334,20 @@ class Observation < ApplicationRecord
 
 	end
 
-	def self.birth_res_zip_code_to( field, as = nil )
-		o1at = Observation.arel_table	#	don't think that I can alias the initial table
-		o2at = Observation.arel_table.alias('o2')
-
-		Observation
-			.joins( outer(o2at, o1at[:chirp_id].eq(o2at[:chirp_id])
-				.and( o2at[:concept].eq field ).and( o2at[:source_table].eq 'births' )))
-			.where( o1at[:concept].eq 'birth_zip')
-			.where( o1at[:source_table].eq 'births' )
-			.group( o1at[:value], o2at[:value] )
-			.select( o1at[:value].as('birth_res_zip_code'), o2at[:value] )
-			.select( o1at[:chirp_id].count(:distinct).as('count') )
-			.order( o1at[:value], o2at[:value] )
-	end
+#	def self.birth_res_zip_code_to( field, as = nil )
+#		o1at = Observation.arel_table	#	don't think that I can alias the initial table
+#		o2at = Observation.arel_table.alias('o2')
+#
+#		Observation
+#			.joins( outer(o2at, o1at[:chirp_id].eq(o2at[:chirp_id])
+#				.and( o2at[:concept].eq field ).and( o2at[:source_table].eq 'births' )))
+#			.where( o1at[:concept].eq 'birth_zip')
+#			.where( o1at[:source_table].eq 'births' )
+#			.group( o1at[:value], o2at[:value] )
+#			.select( o1at[:value].as('birth_res_zip_code'), o2at[:value] )
+#			.select( o1at[:chirp_id].count(:distinct).as('count') )
+#			.order( o1at[:value], o2at[:value] )
+#	end
 
 	def self.birth_xy( x, y )
 		o1at = Observation.arel_table	#	don't think that I can alias the initial table

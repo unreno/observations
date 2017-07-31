@@ -34,8 +34,9 @@ Rails.application.routes.draw do
 	end
 
 #	get 'birth_weight_group_to/:v(.:format)' => 'birth_weight_group_to#show'
-	resource :birth_weight_group_to, only: :show
-	resource :birth_res_zip_code_to, only: :show
+	resource :group_count, only: :show
+#	resource :birth_weight_group_to, only: :show
+#	resource :birth_res_zip_code_to, only: :show
 
 
 	# For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
