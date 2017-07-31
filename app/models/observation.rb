@@ -287,20 +287,6 @@ class Observation < ApplicationRecord
 			.order( o1at[:value], o2at[:value] )
 	end
 
-#	def self.birth_weight_group_to( field, as = nil )
-#		o1at = Observation.arel_table	#	don't think that I can alias the initial table
-#		o2at = Observation.arel_table.alias('o2')
-#
-#		Observation
-#			.joins( outer(o2at, o1at[:chirp_id].eq(o2at[:chirp_id])
-#				.and( o2at[:concept].eq field ).and( o2at[:source_table].eq 'births' )))
-#			.where( o1at[:concept].eq 'birth_weight_group')
-#			.where( o1at[:source_table].eq 'births' )
-#			.group( o1at[:value], o2at[:value] )
-#			.select( o1at[:value].as('birth_weight_group'), o2at[:value] )
-#			.select( o1at[:chirp_id].count(:distinct).as('count') )
-#	end
-
 	def self.birth_res_zip_code_percents( field, as = nil )
 		o1at = Observation.arel_table	#	don't think that I can alias the initial table
 		o2at = o1at.alias('o2')
@@ -333,21 +319,6 @@ class Observation < ApplicationRecord
 			.order( o1at[:value] )
 
 	end
-
-#	def self.birth_res_zip_code_to( field, as = nil )
-#		o1at = Observation.arel_table	#	don't think that I can alias the initial table
-#		o2at = Observation.arel_table.alias('o2')
-#
-#		Observation
-#			.joins( outer(o2at, o1at[:chirp_id].eq(o2at[:chirp_id])
-#				.and( o2at[:concept].eq field ).and( o2at[:source_table].eq 'births' )))
-#			.where( o1at[:concept].eq 'birth_zip')
-#			.where( o1at[:source_table].eq 'births' )
-#			.group( o1at[:value], o2at[:value] )
-#			.select( o1at[:value].as('birth_res_zip_code'), o2at[:value] )
-#			.select( o1at[:chirp_id].count(:distinct).as('count') )
-#			.order( o1at[:value], o2at[:value] )
-#	end
 
 	def self.birth_xy( x, y )
 		o1at = Observation.arel_table	#	don't think that I can alias the initial table
@@ -395,128 +366,6 @@ class Observation < ApplicationRecord
 			.where( o1at[:source_table].eq 'births' )
 			.select( o1at[:value].as('weight'), o2at[:value].as('wgroup'), o4at[:value].as('zip') )
 	end
-
-#		def self.parallel_coord_test
-#			o1at = Observation.arel_table	#	don't think that I can alias the initial table
-#			o2at = Observation.arel_table.alias('o2')
-#			o3at = Observation.arel_table.alias('o3')
-#			o4at = Observation.arel_table.alias('o4')
-#			o5at = Observation.arel_table.alias('o5')
-#			o6at = Observation.arel_table.alias('o6')
-#			o7at = Observation.arel_table.alias('o7')
-#			o8at = Observation.arel_table.alias('o8')
-#			o9at = Observation.arel_table.alias('o9')
-#			o10at = Observation.arel_table.alias('o10')
-#			o11at = Observation.arel_table.alias('o11')
-#	
-#			weight = Arel::Nodes::NamedFunction.new("CAST", [o1at[:value].as("INT")], "birth_weight_grams")
-#			age = Arel::Nodes::NamedFunction.new("CAST", [o2at[:value].as("INT")], "mother_age")
-#			alcohol_use = Arel::Nodes::NamedFunction.new("CAST", [o3at[:raw].as("INT")], "alcohol_use")
-#			drug_use = Arel::Nodes::NamedFunction.new("CAST", [o4at[:raw].as("INT")], "drug_use")
-#			tobacco_use = Arel::Nodes::NamedFunction.new("CAST", [o5at[:raw].as("INT")], "tobacco_use")
-#			prenatal_care = Arel::Nodes::NamedFunction.new("CAST", [o6at[:raw].as("INT")], "prenatal_care")
-#			pre_preg_weight = Arel::Nodes::NamedFunction.new("CAST", [o7at[:value].as("INT")], "pre_preg_weight")
-#			delivery_weight = Arel::Nodes::NamedFunction.new("CAST", [o8at[:value].as("INT")], "delivery_weight")
-#			mother_weight_change = Arel::Nodes::Subtraction.new(
-#					Arel::Nodes::NamedFunction.new("CAST", [o8at[:value].as("INT")]),
-#					Arel::Nodes::NamedFunction.new("CAST", [o7at[:value].as("INT")])
-#				).as('mother_weight_change')
-#			sex = Arel::Nodes::NamedFunction.new("CAST", [o9at[:raw].as("INT")], "sex")
-#			facility_type = Arel::Nodes::NamedFunction.new("CAST", [o10at[:raw].as("INT")], "facility_type")
-#			source_pay = Arel::Nodes::NamedFunction.new("CAST", [o11at[:raw].as("INT")], "source_pay")
-#	
-#			Observation
-#				.joins( outer(o2at, o1at[:chirp_id].eq(o2at[:chirp_id])) )
-#				.joins( outer(o3at, o1at[:chirp_id].eq(o3at[:chirp_id])) )
-#				.joins( outer(o4at, o1at[:chirp_id].eq(o4at[:chirp_id])) )
-#				.joins( outer(o5at, o1at[:chirp_id].eq(o5at[:chirp_id])) )
-#				.joins( outer(o6at, o1at[:chirp_id].eq(o6at[:chirp_id])) )
-#				.joins( outer(o7at, o1at[:chirp_id].eq(o7at[:chirp_id])) )
-#				.joins( outer(o8at, o1at[:chirp_id].eq(o8at[:chirp_id])) )
-#				.joins( outer(o9at, o1at[:chirp_id].eq(o9at[:chirp_id])) )
-#				.joins( outer(o10at, o1at[:chirp_id].eq(o10at[:chirp_id])) )
-#				.joins( outer(o11at, o1at[:chirp_id].eq(o11at[:chirp_id])) )
-#				.where( o1at[:concept].eq 'birth_weight_grams' )
-#				.where( o1at[:value].not_eq '8888' )
-#				.where( o2at[:concept].eq('b2_mother_age') )
-#				.where( o2at[:value].not_eq '99' )
-#				.where( o3at[:concept].eq('m_alcohol_use') )
-#				.where( o4at[:concept].eq('m_drug_use') )
-#				.where( o5at[:concept].eq('b2_tobacco_use') )
-#				.where( o6at[:concept].eq('b2_prenatal_yesno') )
-#				.where( o7at[:concept].eq('b2_mother_pre_preg_wt') )
-#				.where( o7at[:value].not_eq('999') )
-#				.where( o8at[:concept].eq('b2_mother_wt_at_deliv') )
-#				.where( o8at[:value].not_eq('999') )
-#				.where( o9at[:concept].eq('sex') )
-#				.where( o10at[:concept].eq('fac_type_code') )
-#				.where( o11at[:concept].eq('b2_source_pay_code') )
-#				.select( weight, age, alcohol_use, drug_use, tobacco_use, prenatal_care,
-#					pre_preg_weight, delivery_weight, mother_weight_change, sex, facility_type, source_pay )
-#	#			.limit(10)
-#		end
-#	
-#		#	More than above
-#		def self.parallel_coord_csv
-#			o1at = Observation.arel_table	#	don't think that I can alias the initial table
-#			o2at = Observation.arel_table.alias('o2')
-#			o3at = Observation.arel_table.alias('o3')
-#			o4at = Observation.arel_table.alias('o4')
-#			o5at = Observation.arel_table.alias('o5')
-#			o6at = Observation.arel_table.alias('o6')
-#			o7at = Observation.arel_table.alias('o7')
-#			o8at = Observation.arel_table.alias('o8')
-#			o9at = Observation.arel_table.alias('o9')
-#			o10at = Observation.arel_table.alias('o10')
-#			o11at = Observation.arel_table.alias('o11')
-#	
-#			weight = Arel::Nodes::NamedFunction.new("CAST", [o1at[:value].as("INT")], "birth_weight_grams")
-#			age = Arel::Nodes::NamedFunction.new("CAST", [o2at[:value].as("INT")], "mother_age")
-#			alcohol_use = Arel::Nodes::NamedFunction.new("CAST", [o3at[:raw].as("INT")], "alcohol_use")
-#			drug_use = Arel::Nodes::NamedFunction.new("CAST", [o4at[:raw].as("INT")], "drug_use")
-#			tobacco_use = Arel::Nodes::NamedFunction.new("CAST", [o5at[:raw].as("INT")], "tobacco_use")
-#			prenatal_care = Arel::Nodes::NamedFunction.new("CAST", [o6at[:raw].as("INT")], "prenatal_care")
-#			pre_preg_weight = Arel::Nodes::NamedFunction.new("CAST", [o7at[:value].as("INT")], "pre_preg_weight")
-#			delivery_weight = Arel::Nodes::NamedFunction.new("CAST", [o8at[:value].as("INT")], "delivery_weight")
-#			mother_weight_change = Arel::Nodes::Subtraction.new(
-#					Arel::Nodes::NamedFunction.new("CAST", [o8at[:value].as("INT")]),
-#					Arel::Nodes::NamedFunction.new("CAST", [o7at[:value].as("INT")])
-#				).as('mother_weight_change')
-#			sex = Arel::Nodes::NamedFunction.new("CAST", [o9at[:raw].as("INT")], "sex")
-#			facility_type = Arel::Nodes::NamedFunction.new("CAST", [o10at[:raw].as("INT")], "facility_type")
-#			source_pay = Arel::Nodes::NamedFunction.new("CAST", [o11at[:raw].as("INT")], "source_pay")
-#	
-#			Observation
-#				.joins( outer(o2at, o1at[:chirp_id].eq(o2at[:chirp_id])) )
-#				.joins( outer(o3at, o1at[:chirp_id].eq(o3at[:chirp_id])) )
-#				.joins( outer(o4at, o1at[:chirp_id].eq(o4at[:chirp_id])) )
-#				.joins( outer(o5at, o1at[:chirp_id].eq(o5at[:chirp_id])) )
-#				.joins( outer(o6at, o1at[:chirp_id].eq(o6at[:chirp_id])) )
-#				.joins( outer(o7at, o1at[:chirp_id].eq(o7at[:chirp_id])) )
-#				.joins( outer(o8at, o1at[:chirp_id].eq(o8at[:chirp_id])) )
-#				.joins( outer(o9at, o1at[:chirp_id].eq(o9at[:chirp_id])) )
-#				.joins( outer(o10at, o1at[:chirp_id].eq(o10at[:chirp_id])) )
-#				.joins( outer(o11at, o1at[:chirp_id].eq(o11at[:chirp_id])) )
-#				.where( o1at[:concept].eq 'birth_weight_grams' )
-#				.where( o1at[:value].not_eq '8888' )
-#				.where( o2at[:concept].eq('b2_mother_age') )
-#				.where( o2at[:value].not_eq '99' )
-#				.where( o3at[:concept].eq('m_alcohol_use') )
-#				.where( o4at[:concept].eq('m_drug_use') )
-#				.where( o5at[:concept].eq('b2_tobacco_use') )
-#				.where( o6at[:concept].eq('b2_prenatal_yesno') )
-#				.where( o7at[:concept].eq('b2_mother_pre_preg_wt') )
-#				.where( o7at[:value].not_eq('999') )
-#				.where( o8at[:concept].eq('b2_mother_wt_at_deliv') )
-#				.where( o8at[:value].not_eq('999') )
-#				.where( o9at[:concept].eq('sex') )
-#				.where( o10at[:concept].eq('fac_type_code') )
-#				.where( o11at[:concept].eq('b2_source_pay_code') )
-#				.select( weight, age, alcohol_use, drug_use, tobacco_use, prenatal_care,
-#					pre_preg_weight, delivery_weight, mother_weight_change, sex, facility_type, source_pay )
-#	#			.order(o1at[:chirp_id])
-#	#			.limit(100)
-#		end
 
 	#	Putting conditions in the join is MUCH FASTER and will then include empty values.
 	def self.parallel_coords
@@ -819,6 +668,7 @@ class Observation < ApplicationRecord
 			.group( o1at[:concept], o1at[:value] )
 			.order( o1at[:concept], o1at[:value] )
 
+#	Moved this into controller so can also use .to_sql
 #			.count
 #			.inject({}){|h,v| h[v[0][0]]||={};h[v[0][0]][v[0][1]] = v[1];h }
 

@@ -45,7 +45,20 @@ children's birth records have been matched to the WebIZ immunization records
 <p>Some sample reports.</p>
 <ul>
 	<li><%= link_to "One concept value counts to grouped by another concept's value", group_count_path %></li>
+	<li>Examples:<ul>
+	<li><%= link_to "Birth Weight Group to Zip", group_count_path(concept: :birth_weight_group, group: :birth_zip ) %></li>
+	<li><%= link_to "Birth Weight Group to Mom Alcohol Use", group_count_path(concept: :birth_weight_group, group: :m_alcohol_use) %></li>
+	<li><%= link_to "Birth Weight Group to Mom Drug Use", group_count_path(concept: :birth_weight_group, group: :m_drug_use) %></li>
+	<li><%= link_to "Birth Weight Group to Mom OTC Drug Use", group_count_path(concept: :birth_weight_group, group: :m_drug_otc) %></li>
+	<li><%= link_to "Birth Weight Group to Mom Prescription Drug Use", group_count_path(concept: :birth_weight_group, group: :m_drug_prescription) %></li>
+	<li><%= link_to "Birth Weight Group to Mom Age Group", group_count_path(concept: :birth_weight_group, group: :mother_age_group) %></li>
+	<li><%= link_to "Birth Weight Group to Source Pay", group_count_path(concept: :birth_weight_group, group: :b2_source_pay_code) %></li>
+	<li><%= link_to "Birth Weight Group to Mom Tobacco Use", group_count_path(concept: :birth_weight_group, group: :b2_tobacco_use) %></li>
+	<li><%= link_to "Birth Weight Group to Prenatal Care", group_count_path(concept: :birth_weight_group, group: :b2_prenatal_yesno) %></li>
+	<li><%= link_to "Birth Weight Group to WIC", group_count_path(concept: :birth_weight_group, group: :b2_mother_wic_yesno) %></li>
+	<li><%= link_to "Birth Weight Group to Breastfeeding", group_count_path(concept: :birth_weight_group, group: :m_breastfeeding) %></li>
 	<li><%= link_to "Birth Res Zip Code Counts to ?", group_count_path( group: 'birth_zip') %></li>
+</ul></li>
 	<li><%= link_to "Birth Res Zip Code Percents to ?", birth_res_zip_code_percents_reports_path %></li>
 	<li><%= link_to "Enumerated Counts", enumerated_counts_reports_path %></li>
 	<li><%= link_to "Sex Birth Counts by Quarter/Year", sex_birth_counts_by_quarter_year_reports_path %></li>
@@ -61,31 +74,9 @@ children's birth records have been matched to the WebIZ immunization records
 	<li><%= link_to "Parallel Coord from CSV", parallel_coords_csv_reports_path %></li>
 	<li><%= link_to "Ave Birth Weight to Zip Map", ave_birth_weight_to_zip_reports_path %></li>
 	<li><%= link_to "Birth Weight Group to Percent of Zip", birth_weight_group_to_percent_of_reports_path(v: 'DEM:ZIP') %></li>
-<!--
-	<li><%= link_to "Birth Weight Group to Pre-pregnancy Cigarettes", group_count_path(concept: :birth_weight_group, group: :b2_mother_cig_prev) %></li>
-	<li><%= link_to "Birth Weight Group to First Trimester Cigarettes", group_count_path(concept: :birth_weight_group, group: :b2_mother_cig_first_tri) %></li>
-	<li><%= link_to "Birth Weight Group to Second Trimester Cigarettes", group_count_path(concept: :birth_weight_group, group: :b2_mother_cig_second_tri) %></li>
-	<li><%= link_to "Birth Weight Group to Last Trimester Cigarettes", group_count_path(concept: :birth_weight_group, group: :b2_mother_cig_last_tri) %></li>
--->
 
-	<li><%= link_to "Birth Weight Group to Zip", group_count_path(concept: :birth_weight_group, group: :birth_zip ) %></li>
-	<li><%= link_to "Birth Weight Group to Mom Alcohol Use", group_count_path(concept: :birth_weight_group, group: :m_alcohol_use) %></li>
-	<li><%= link_to "Birth Weight Group to Mom Drug Use", group_count_path(concept: :birth_weight_group, group: :m_drug_use) %></li>
-	<li><%= link_to "Birth Weight Group to Mom OTC Drug Use", group_count_path(concept: :birth_weight_group, group: :m_drug_otc) %></li>
-	<li><%= link_to "Birth Weight Group to Mom Prescription Drug Use", group_count_path(concept: :birth_weight_group, group: :m_drug_prescription) %></li>
-	<li><%= link_to "Birth Weight Group to Mom Age Group", group_count_path(concept: :birth_weight_group, group: :mother_age_group) %></li>
-<!--
-	<li><%= link_to "Birth Weight Group to Mom Race", group_count_path(concept: :birth_weight_group, group: :mom_race1) %></li>
-	<li><%= link_to "Birth Weight Group to Mom Race ethnchs", group_count_path(concept: :birth_weight_group, group: :momrace_ethnchs) %></li>
--->
-	<li><%= link_to "Birth Weight Group to Source Pay", group_count_path(concept: :birth_weight_group, group: :b2_source_pay_code) %></li>
-	<li><%= link_to "Birth Weight Group to Mom Tobacco Use", group_count_path(concept: :birth_weight_group, group: :b2_tobacco_use) %></li>
-	<li><%= link_to "Birth Weight Group to Prenatal Care", group_count_path(concept: :birth_weight_group, group: :b2_prenatal_yesno) %></li>
-	<li><%= link_to "Birth Weight Group to WIC", group_count_path(concept: :birth_weight_group, group: :b2_mother_wic_yesno) %></li>
-	<li><%= link_to "Birth Weight Group to Breastfeeding", group_count_path(concept: :birth_weight_group, group: :m_breastfeeding) %></li>
-
-	<li><%= link_to "Birth Weight to Mom Age", birth_weight_to_mom_age_reports_path %></li>
-	<li><%= link_to "Birth Weight to Tot Cigs", birth_weight_to_tot_cigs_reports_path %></li>
+	<li><%= link_to "Birth Weight to Mom Age (scatter)", birth_weight_to_mom_age_reports_path %></li>
+	<li><%= link_to "Birth Weight to Tot Cigs (scatter)", birth_weight_to_tot_cigs_reports_path %></li>
 	<li><%= link_to "Completed Immunization Counts for DOB 2015", completed_immunizations_reports_path %></li>
 	<li><%= link_to "Total Vaccination Counts for DOB 2015", total_vaccination_counts_reports_path %></li>
 	<li><%= link_to "Individual Vaccination Counts for DOB 2015", individual_vaccination_counts_by_month_year_reports_path %></li>

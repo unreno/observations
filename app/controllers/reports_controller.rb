@@ -54,7 +54,6 @@ class ReportsController < ApplicationController
 	end
 
 	def birth_res_zip_code_percents
-#		@concepts = %w{ sex b2_prenatal_yesno m_alcohol_use m_drug_use }
 		@concepts = Observation::ENUMERATED_CONCEPTS
 		if params[:v].present?
 			@value = params[:v]
