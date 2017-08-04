@@ -93,3 +93,4 @@ gem 'tiny_tds', '~> 1'
 gem 'activerecord-sqlserver-adapter'
 
 
+gem 'therubyracer', platforms: :ruby
