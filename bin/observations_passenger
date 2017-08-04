@@ -8,11 +8,11 @@
 #
 #	If updating, will need to run ...
 #
-#	systemctl daemon-reload
+#	sudo systemctl daemon-reload
 
 
 ### BEGIN INIT INFO 
-# Provides:					Observations passenger
+# Provides:					Observations_passenger
 # Default-Start:		 2 3 4 5 
 # Default-Stop:			0 1 6 
 # Required-Start:		$remote_fs $syslog
