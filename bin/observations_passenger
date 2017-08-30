@@ -6,10 +6,13 @@
 #	sudo cp $0 /etc/init.d/
 #	sudo update-rc.d observations_passenger defaults
 #
-#	If updating, will need to run ...
-#
-#	sudo systemctl daemon-reload
+#	If updating, may need to run ... 
+#		sudo systemctl daemon-reload
 
+
+
+
+#	Provides only uses the first space separated string which must be unique.
 
 ### BEGIN INIT INFO 
 # Provides:					Observations_passenger
