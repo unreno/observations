@@ -155,6 +155,16 @@ ssl_dhparam /home/jakewendt/dhparams.pem;
 #		I would like to just run on port 80 rather than on 3000 with a redirect to 80,
 #		but I can't get 80 to redirect, just yet.
 
+#	Since no longer using iptables for redirect, need to do it here.
+
+
+		server {
+			#	Every block seems to explicitly need a server name.
+			server_name chirp.acs.unr.edu;
+			listen 80;
+			return 301 https://$server_name$request_uri;
+		}
+
 		server {
 			#	Every block seems to explicitly need a server name.
 			server_name chirp.acs.unr.edu;
