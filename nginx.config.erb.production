@@ -165,25 +165,27 @@ ssl_dhparam /home/jakewendt/dhparams.pem;
 #	then this should work
 #
 
-		server {
-			#	Every block seems to explicitly need a server name.
-			server_name chirp.acs.unr.edu;
-			listen 80;
-			return 301 https://$server_name$request_uri;
-		}
+#		server {
+#			#	Every block seems to explicitly need a server name.
+#			server_name chirp.acs.unr.edu;
+#			listen 80;
+#			return 301 https://$server_name$request_uri;
+#		}
 
 		server {
 			#	Every block seems to explicitly need a server name.
 			server_name chirp.acs.unr.edu;
-			listen 3000;
+			listen 80;
+			listen 3000;	#	not open in firewall in production which is why doesn't work
 			return 301 https://$server_name$request_uri;
 		}
 
 		server{
 			#	Every block seems to explicitly need a server name.
 			server_name 134.197.21.70;
+			listen			 80;
 			listen			 443;
-			listen			 3000;
+			listen			 3000;	#	not open in firewall in production which is why doesn't work
 			return				 301 https://chirp.acs.unr.edu$request_uri;
 		}
 
