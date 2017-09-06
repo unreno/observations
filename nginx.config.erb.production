@@ -157,6 +157,13 @@ ssl_dhparam /home/jakewendt/dhparams.pem;
 
 #	Since no longer using iptables for redirect, need to do it here.
 
+#	so long as apache is not already listening on port 80
+
+#
+#	Disable apache first
+#		sudo update-rc.d apache2 disable
+#	then this should work
+#
 
 		server {
 			#	Every block seems to explicitly need a server name.
