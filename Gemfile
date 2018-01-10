@@ -94,3 +94,13 @@ gem 'activerecord-sqlserver-adapter'
 
 
 gem 'therubyracer', platforms: :ruby
+#
+#	problems installing therubyracer / libv8
+#
+#	sudo port uninstall libtool
+#	sudo port select gcc none
+#	gem install libv8 -v 3.16.14.19
+#	bundle ins
+#	
+#
+
