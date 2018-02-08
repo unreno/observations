@@ -51,7 +51,7 @@ case "$1" in
 		cd $APP
 #		cmd="$PASSENGER start --port $PORT --environment $ENVIRONMENT --daemonize"	# --max-pool-size 2"
 #		settings in passenger-standalone.json
-		cmd="$PASSENGER start"
+		cmd="$PASSENGER start --user jakewendt"
 		echo $cmd
 		$cmd
 
