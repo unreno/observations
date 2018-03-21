@@ -52,6 +52,7 @@ case "$1" in
 #		cmd="$PASSENGER start --port $PORT --environment $ENVIRONMENT --daemonize"	# --max-pool-size 2"
 #		settings in passenger-standalone.json
 		cmd="$PASSENGER start --user jakewendt"
+#		cmd="sudo --login --user jakewendt $PASSENGER start"
 		echo $cmd
 		$cmd
 
