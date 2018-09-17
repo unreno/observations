@@ -12,4 +12,4 @@ class ActiveSupport::TestCase
 end
 
 
-require 'mocha/mini_test'	#	needs to be kinda last for some reason
+require 'mocha/minitest'	#	needs to be kinda last for some reason

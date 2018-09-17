@@ -42,6 +42,8 @@ class Observation < ApplicationRecord
 			raise "I'm confused"
 		end
 
+#	Reports Controller should get completed_immunizations_reports: DEPRECATION WARNING: Delegating project to arel is deprecated and will be removed in Rails 6.0. (called from completed_immunizations at /Users/jakewendt/github/unreno/observations/app/models/observation.rb:50)
+
 		inside = Arel::Table.new('inside')
 		#	SUM(CASE ... is not agnostic but seems to work on both MySQL/MariaDB and SQL Server!
 		outside_select = Observation.from(inside_select.as('inside').to_sql)
@@ -123,6 +125,8 @@ class Observation < ApplicationRecord
 #		table1 = Observation.select("first_union.*").from(o1at.create_table_alias(union1,:first_union).to_sql)
 #		union2 = table1.union(o3)
 #		table2 = Observation.from(o1at.create_table_alias(union2,:observations).to_sql)
+
+#	Reports Controller should get total_vaccination_counts_reports: DEPRECATION WARNING: Delegating union to arel is deprecated and will be removed in Rails 6.0. (called from total_vaccination_counts at /Users/jakewendt/github/unreno/observations/app/models/observation.rb:130)
 
 		Observation.from( o1at.create_table_alias(
 				Observation.select("first_union.*").from(
@@ -241,6 +245,9 @@ class Observation < ApplicationRecord
 
 		#	same name as in .as(...) above (to be used when selecting or whereing)
 		grouping = Arel::Table.new( grouping_table_name )
+
+#Reports Controller should get birth_weight_group_to_percent_of_reports: DEPRECATION WARNING: Delegating outer_join to arel is deprecated and will be removed in Rails 6.0. (called from birth_weight_group_percents_to at /Users/jakewendt/github/unreno/observations/app/models/observation.rb:251)
+
 
 		#	select before join, project after join (same thing)
 		outside_select = Observation.from(grouping_sql.to_sql)
